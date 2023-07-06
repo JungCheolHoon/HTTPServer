@@ -1,10 +1,10 @@
-package kr.co.mz.tutorial.jdbc.init;
+package kr.co.mz.tutorial.jdbc.db.dao.init;
 
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import kr.co.mz.tutorial.jdbc.db.HikariPoolFactory;
-import kr.co.mz.tutorial.jdbc.model.Report;
+import kr.co.mz.tutorial.jdbc.db.model.Report;
 
 public class CreateReport {
 

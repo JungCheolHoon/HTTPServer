@@ -1,12 +1,12 @@
-package kr.co.mz.tutorial.jdbc.query;
+package kr.co.mz.tutorial.jdbc.db.dao.query;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import kr.co.mz.tutorial.jdbc.db.HikariPoolFactory;
-import kr.co.mz.tutorial.jdbc.model.Board;
-import kr.co.mz.tutorial.jdbc.model.BoardFile;
+import kr.co.mz.tutorial.jdbc.db.model.Board;
+import kr.co.mz.tutorial.jdbc.db.model.BoardFile;
 
 public class SearchBoardAndBoardFile2 {
 

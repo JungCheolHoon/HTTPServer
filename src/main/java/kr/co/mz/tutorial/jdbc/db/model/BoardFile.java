@@ -1,4 +1,4 @@
-package kr.co.mz.tutorial.jdbc.model;
+package kr.co.mz.tutorial.jdbc.db.model;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

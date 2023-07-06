@@ -1,6 +1,6 @@
-package kr.co.mz.tutorial.jdbc.query;
+package kr.co.mz.tutorial.jdbc.db.dao.query;
 
-import static kr.co.mz.tutorial.jdbc.model.Board.fromResultSet;
+import static kr.co.mz.tutorial.jdbc.db.model.Board.fromResultSet;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -8,8 +8,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import kr.co.mz.tutorial.jdbc.db.HikariPoolFactory;
-import kr.co.mz.tutorial.jdbc.model.Board;
-import kr.co.mz.tutorial.jdbc.model.BoardFile;
+import kr.co.mz.tutorial.jdbc.db.model.Board;
+import kr.co.mz.tutorial.jdbc.db.model.BoardFile;
 
 public class SearchBoardAndBoardFile {
 

@@ -1,4 +1,4 @@
-package kr.co.mz.tutorial.jdbc.model;
+package kr.co.mz.tutorial.jdbc.db.model;
 
 public class Comment {
 

@@ -1,4 +1,4 @@
-package kr.co.mz.tutorial.jdbc.test.transaction;
+package kr.co.mz.tutorial.jdbc.test;
 
 import java.io.IOException;
 import java.sql.Connection;

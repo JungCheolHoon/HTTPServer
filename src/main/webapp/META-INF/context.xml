@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+  <Resource name="jdbc/myDataSource" auth="Container" type="javax.sql.DataSource"
+    factory="com.zaxxer.hikari.HikariJNDIFactory"
+    maximumPoolSize="100" idleTimeout="30000" connectionTimeout="5000"
+    dataSourceClassName="com.mysql.cj.jdbc.MysqlDataSource"
+    dataSource.url="jdbc:mysql://localhost:3306/webchat?useSSL=false&amp;serverTimezone=UTC"
+    dataSource.user="webchat" dataSource.password="webchat!"/>
+</Context>

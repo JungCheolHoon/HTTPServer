@@ -6,16 +6,43 @@
   version="3.1">
 
   <servlet>
-    <servlet-name>jdbc-transaction-tutorial</servlet-name>
-    <servlet-class>kr.co.mz.tutorial.jdbc.MyServlet</servlet-class>
+    <servlet-name>LoginServlet</servlet-name>
+    <servlet-class>kr.co.mz.tutorial.jdbc.servlet.LoginServlet</servlet-class>
   </servlet>
-
   <servlet-mapping>
-    <servlet-name>jdbc-transaction-tutorial</servlet-name>
+    <servlet-name>LoginServlet</servlet-name>
+    <url-pattern>/login</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>LoginServlet</servlet-name>
     <url-pattern>/</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <servlet-name>MainServlet</servlet-name>
+    <servlet-class>kr.co.mz.tutorial.jdbc.servlet.MainServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MainServlet</servlet-name>
+    <url-pattern>/main</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>JoinServlet</servlet-name>
+    <servlet-class>kr.co.mz.tutorial.jdbc.servlet.JoinServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>JoinServlet</servlet-name>
+    <url-pattern>/join</url-pattern>
+  </servlet-mapping>
   <listener>
-    <listener-class>ckr.co.mz.tutorial.jdbc.MyServletContextListener</listener-class>
+    <listener-class>kr.co.mz.tutorial.jdbc.listener.MyServletContextListener</listener-class>
   </listener>
+  <filter>
+    <filter-name>loggingFilter</filter-name>
+    <filter-class>kr.co.mz.tutorial.jdbc.filter.AuthenticationFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>loggingFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
 
 </web-app>

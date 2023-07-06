@@ -1,4 +1,4 @@
-package kr.co.mz.tutorial.jdbc.init;
+package kr.co.mz.tutorial.jdbc.db.dao.init;
 
 import java.io.File;
 import java.io.IOException;
@@ -6,8 +6,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.UUID;
 import kr.co.mz.tutorial.jdbc.db.HikariPoolFactory;
+import kr.co.mz.tutorial.jdbc.db.model.BoardFile;
 import kr.co.mz.tutorial.jdbc.file.FileService;
-import kr.co.mz.tutorial.jdbc.model.BoardFile;
 
 public class CreateBoardFile {
 
