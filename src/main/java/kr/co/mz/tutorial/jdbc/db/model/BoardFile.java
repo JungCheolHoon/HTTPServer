@@ -2,6 +2,7 @@ package kr.co.mz.tutorial.jdbc.db.model;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Objects;
 
 public class BoardFile extends AbstractModel {
 
@@ -91,11 +92,34 @@ public class BoardFile extends AbstractModel {
         this.fileExtension = fileExtension;
     }
 
-    public static BoardFile formResultSet(ResultSet resultSet) throws SQLException {
-        return new BoardFile(
-            resultSet.getInt(1), resultSet.getInt(8), resultSet.getString(9),
-            resultSet.getString(10), resultSet.getString(11), resultSet.getLong(12),
-            resultSet.getString(13)
-        );
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        BoardFile boardFile = (BoardFile) o;
+        return seq == boardFile.seq && Objects.equals(fileUuid, boardFile.fileUuid);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(seq, fileUuid);
+    }
+
+    public static BoardFile fromResultSet(ResultSet resultSet) {
+        var boardFile = new BoardFile();
+        try {
+            boardFile.setBoardSeq(resultSet.getInt("b.seq"));
+            boardFile.setFilePath(resultSet.getString("bf.file_path"));
+            boardFile.setModifiedTime(resultSet.getTimestamp("bf.modified_time"));
+            boardFile.setSeq(resultSet.getInt("bf.seq"));
+            boardFile.setFileName(resultSet.getString("bf.file_name"));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return boardFile;
     }
 }

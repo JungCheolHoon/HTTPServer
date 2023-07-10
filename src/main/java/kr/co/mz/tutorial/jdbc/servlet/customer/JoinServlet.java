@@ -1,4 +1,4 @@
-package kr.co.mz.tutorial.jdbc.servlet;
+package kr.co.mz.tutorial.jdbc.servlet.customer;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -94,11 +94,13 @@ public class JoinServlet extends HttpServlet {
         out.println("</div>");
         out.println("</body>");
         out.println("</html>");
+        out.close();
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
+        req.setCharacterEncoding("UTF-8");
         var customer = new Customer(req.getParameter("username"), req.getParameter("password")
             , req.getParameter("name"), req.getParameter("address"));
         try {

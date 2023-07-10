@@ -38,16 +38,12 @@ public class SearchBoardAndBoardFile {
                 var optional = Optional.ofNullable(boardMap.get(board_seq));
                 board = optional.orElseGet(() -> {
                     Board board2 = new Board();
-                    try {
-                        Board.fromResultSet(resultSet, board2);
-                    } catch (SQLException e) {
-                        throw new RuntimeException(e);
-                    }
+                    Board.fromResultSet(resultSet);
                     return board2;
                 });
                 // boardSeq 값이 다른 데이터가 들어오면 board 를 새로 생성
-                fromResultSet(resultSet, board);
-                board.addBoardFile(BoardFile.formResultSet(resultSet));
+                fromResultSet(resultSet);
+                board.addBoardFile(BoardFile.fromResultSet(resultSet));
                 // 같은 주소라면 보드를 다시 추가하지 않고 다른 주소라면 추가
                 boardMap.put(resultSet.getInt(1), board);
             }

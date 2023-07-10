@@ -1,4 +1,4 @@
-package kr.co.mz.tutorial.jdbc.servlet;
+package kr.co.mz.tutorial.jdbc.servlet.customer;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -82,15 +82,19 @@ public class LoginServlet extends HttpServlet {
         out.println("</div>");
         out.println("</body>");
         out.println("</html>");
+        out.close();
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        req.setCharacterEncoding("UTF-8");
         String username = req.getParameter("username");
         String password = req.getParameter("password");
         // 로그인 처리 로직
         try {
-            if (isValidCustomer(username, password)) {
+            var customerSeq = isValidCustomer(username, password);
+            if (customerSeq != 0) {
+                getServletContext().setAttribute("customerSeq", customerSeq);
                 resp.sendRedirect("/main");
             } else {
                 resp.sendRedirect("/login");
@@ -100,7 +104,7 @@ public class LoginServlet extends HttpServlet {
         }
     }
 
-    private boolean isValidCustomer(String username, String password) throws SQLException {
+    private int isValidCustomer(String username, String password) throws SQLException {
         var dataSource = (DataSource) getServletContext().getAttribute("dataSource");
         return new LoginDao(dataSource).existCustomer(username,
             password);

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context>
-  <Resource name="jdbc/myDataSource" auth="Container" type="javax.sql.DataSource"
+  <Resource name="jdbc/hikariDataSource" auth="Container" type="javax.sql.DataSource"
     factory="com.zaxxer.hikari.HikariJNDIFactory"
     maximumPoolSize="100" idleTimeout="30000" connectionTimeout="5000"
     dataSourceClassName="com.mysql.cj.jdbc.MysqlDataSource"

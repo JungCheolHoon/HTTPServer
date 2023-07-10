@@ -8,24 +8,24 @@ import kr.co.mz.tutorial.jdbc.db.model.Customer;
 
 public class LoginDao {
 
-    DataSource dataSource;
+    private final DataSource dataSource;
 
     public LoginDao(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
-    public boolean existCustomer(String username, String password) throws SQLException {
-        var query = "select exists (select 1 from customer where customer_id=? and password=?)";
+    public int existCustomer(String username, String password) throws SQLException {
+        var query = "select seq from customer where customer_id=? and password=?";
         try (var connection = dataSource.getConnection()
             ; PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setString(1, username);
             ps.setString(2, password);
             ResultSet resultSet = ps.executeQuery();
             if (resultSet.next()) {
-                return true;
+                return resultSet.getInt(1);
             }
         }
-        return false;
+        return 0;
     }
 
     public int joinCustomer(Customer customer) throws SQLException {

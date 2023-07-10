@@ -19,7 +19,7 @@ public class CreateBoard {
         values(?,?,?)""";
 
     public static void main(String[] args) throws SQLException, IOException {
-        var board = new Board("안녕하십니까!", "반가워요~", 8);
+        var board = new Board("안녕하십니까!", "반가워요~", 3, "");
         String fileDirectoryName = FileService.BASIC_DIRECTORY + FileService.generateFileDirectoryName();
         board.addBoardFile(
             new BoardFile(UUID.randomUUID().toString(), "직박구리부리박기.txt",

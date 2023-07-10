@@ -7,7 +7,7 @@
 
   <servlet>
     <servlet-name>LoginServlet</servlet-name>
-    <servlet-class>kr.co.mz.tutorial.jdbc.servlet.LoginServlet</servlet-class>
+    <servlet-class>kr.co.mz.tutorial.jdbc.servlet.customer.LoginServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>LoginServlet</servlet-name>
@@ -27,11 +27,65 @@
   </servlet-mapping>
   <servlet>
     <servlet-name>JoinServlet</servlet-name>
-    <servlet-class>kr.co.mz.tutorial.jdbc.servlet.JoinServlet</servlet-class>
+    <servlet-class>kr.co.mz.tutorial.jdbc.servlet.customer.JoinServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>JoinServlet</servlet-name>
     <url-pattern>/join</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>ViewServlet</servlet-name>
+    <servlet-class>kr.co.mz.tutorial.jdbc.servlet.board.ViewServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ViewServlet</servlet-name>
+    <url-pattern>/viewBoard</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>CommentServlet</servlet-name>
+    <servlet-class>kr.co.mz.tutorial.jdbc.servlet.comment.CommentServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>CommentServlet</servlet-name>
+    <url-pattern>/comment</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>WriteServlet</servlet-name>
+    <servlet-class>kr.co.mz.tutorial.jdbc.servlet.board.WriteServlet</servlet-class>
+    <multipart-config>
+      <location>/Users/mz01-junghunee/Documents/tutorial_directory</location>
+      <max-file-size>5242880</max-file-size> <!-- 5MB -->
+      <max-request-size>10485760</max-request-size> <!-- 10MB -->
+      <file-size-threshold>0</file-size-threshold>
+    </multipart-config>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>WriteServlet</servlet-name>
+    <url-pattern>/writeBoard</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>DeleteServlet</servlet-name>
+    <servlet-class>kr.co.mz.tutorial.jdbc.servlet.board.DeleteServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>DeleteServlet</servlet-name>
+    <url-pattern>/deleteBoard/*</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>UpdateServlet</servlet-name>
+    <servlet-class>kr.co.mz.tutorial.jdbc.servlet.board.UpdateServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>UpdateServlet</servlet-name>
+    <url-pattern>/updateBoard</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>LikesServlet</servlet-name>
+    <servlet-class>kr.co.mz.tutorial.jdbc.servlet.board.likesServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>LikesServlet</servlet-name>
+    <url-pattern>/likesBoard</url-pattern>
   </servlet-mapping>
   <listener>
     <listener-class>kr.co.mz.tutorial.jdbc.listener.MyServletContextListener</listener-class>

@@ -14,10 +14,8 @@ public class MyServletContextListener implements ServletContextListener {
             // JNDI 이름으로 Context 검색
             Context initContext = new InitialContext();
             Context envContext = (Context) initContext.lookup("java:/comp/env");
-
             // DataSource 검색
-            DataSource dataSource = (DataSource) envContext.lookup("jdbc/myDataSource");
-
+            DataSource dataSource = (DataSource) envContext.lookup("jdbc/hikariDataSource");
             sce.getServletContext().setAttribute("dataSource", dataSource);
 
         } catch (Exception e) {

@@ -2,6 +2,8 @@ package kr.co.mz.tutorial.jdbc.db.model;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -11,29 +13,69 @@ public class Board extends AbstractModel {
     private int seq;
     private String title;
     private String content;
+    private String customerName;
     private int customerSeq;
-    private int likes_count;
-    private final Set<BoardFile> boardFileSet = new LinkedHashSet<>();
+    private int likesCount;
+    private String category;
+    private Set<BoardFile> boardFileSet = new LinkedHashSet<>();
+
+    private final Set<Comment> commentSet = new HashSet<>();
 
     public Board() {
     }
 
-    public Board(String title, String content, int customerSeq) {
+    public Board(String title, String content, String category, Set<BoardFile> boardFileSet) {
+        this.title = title;
+        this.content = content;
+        this.category = category;
+        this.boardFileSet = boardFileSet;
+    }
+
+    public Board(String title, String content, int customerSeq, String category) {
         this.title = title;
         this.content = content;
         this.customerSeq = customerSeq;
+        this.category = category;
+    }
+
+    public Board(int seq, String title, String content, String category) {
+        this.seq = seq;
+        this.title = title;
+        this.content = content;
+        this.category = category;
+    }
+
+    public Board(int seq, String title, String content, String customerName, int likes_count, Timestamp modified_time) {
+        this.seq = seq;
+        this.title = title;
+        this.content = content;
+        this.customerName = customerName;
+        this.likesCount = likes_count;
+        super.modifiedTime = modified_time;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public Set<Comment> getCommentSet() {
+        return commentSet;
     }
 
     public Set<BoardFile> getBoardFileSet() {
         return boardFileSet;
     }
 
-    public int getLikes_count() {
-        return likes_count;
+    public int getLikesCount() {
+        return likesCount;
     }
 
-    public void setLikes_count(int likes_count) {
-        this.likes_count = likes_count;
+    public void setLikesCount(int likesCount) {
+        this.likesCount = likesCount;
     }
 
     public void addBoardFile(BoardFile boardFile) {
@@ -72,6 +114,14 @@ public class Board extends AbstractModel {
         this.customerSeq = customerSeq;
     }
 
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -89,12 +139,19 @@ public class Board extends AbstractModel {
         return Objects.hash(seq);
     }
 
-    public static void fromResultSet(ResultSet resultSet, Board board) throws SQLException {
-        board.setTitle(resultSet.getString(2));
-        board.setContent(resultSet.getString(3));
-        board.setCustomerSeq(resultSet.getInt(4));
-        board.setLikes_count(resultSet.getInt(5));
-        board.setCreatedTime(resultSet.getTimestamp(6));
-        board.setModifiedTime(resultSet.getTimestamp(7));
+    public static Board fromResultSet(ResultSet rs) {
+        Board board = new Board();
+        try {
+            board.setSeq(rs.getInt("b.seq"));
+            board.setTitle(rs.getString("b.title"));
+            board.setContent(rs.getString("b.content"));
+            board.setLikesCount(rs.getInt("b.likes_count"));
+            board.setModifiedTime(rs.getTimestamp("b.modified_time"));
+            board.setCategory(rs.getString("b.category"));
+            board.setCustomerName(rs.getString("c.name"));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return board;
     }
 }

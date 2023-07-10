@@ -12,15 +12,15 @@ import kr.co.mz.tutorial.jdbc.file.FileService;
 public class CreateBoardFile {
 
     private static final String QUERY = """
-        insert into board_file(board_seq,file_uuid,file_name,file_path,file_size,file_type) 
+        insert into board_file(board_seq,file_uuid,file_name,file_path,file_size,file_extension) 
         values(?,?,?,?,?,?)""";
 
     public static void main(String[] args) throws SQLException, IOException {
         var dataSource = HikariPoolFactory.createHikariDataSource();
         System.out.println("쿼리 성공한 행수 : " + createBoardFile(
                 dataSource.getConnection(),
-                new BoardFile(UUID.randomUUID().toString(), "직박구리부리박기.txt",
-                    FileService.BASIC_DIRECTORY + FileService.generateFileDirectoryName() + "/직박구리부리박기.txt",
+                new BoardFile(UUID.randomUUID().toString(), "감나비부리박기.txt",
+                    FileService.BASIC_DIRECTORY + FileService.generateFileDirectoryName() + "/감나비잔나비.txt",
                     999, "txt"
                 )
             )
@@ -33,7 +33,7 @@ public class CreateBoardFile {
         try (
             var preparedStatement = connection.prepareStatement(QUERY);
         ) {
-            preparedStatement.setInt(1, boardFile.getBoardSeq());
+            preparedStatement.setInt(1, 3);
             preparedStatement.setString(2, UUID.randomUUID().toString());
             preparedStatement.setString(4, boardFile.getFileName());
             preparedStatement.setString(3, fileDirectoryName);
