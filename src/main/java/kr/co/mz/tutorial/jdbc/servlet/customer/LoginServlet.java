@@ -88,6 +88,7 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         req.setCharacterEncoding("UTF-8");
+        resp.setContentType("UTF-8");
         String username = req.getParameter("username");
         String password = req.getParameter("password");
         // 로그인 처리 로직
@@ -100,7 +101,8 @@ public class LoginServlet extends HttpServlet {
                 resp.sendRedirect("/login");
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            System.out.println("An error occurred while logging in : " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

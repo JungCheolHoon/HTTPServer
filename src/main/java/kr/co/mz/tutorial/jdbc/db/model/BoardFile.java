@@ -109,14 +109,15 @@ public class BoardFile extends AbstractModel {
         return Objects.hash(seq, fileUuid);
     }
 
-    public static BoardFile fromResultSet(ResultSet resultSet) {
+    public static BoardFile fromResultSet(ResultSet rs) {
         var boardFile = new BoardFile();
         try {
-            boardFile.setBoardSeq(resultSet.getInt("b.seq"));
-            boardFile.setFilePath(resultSet.getString("bf.file_path"));
-            boardFile.setModifiedTime(resultSet.getTimestamp("bf.modified_time"));
-            boardFile.setSeq(resultSet.getInt("bf.seq"));
-            boardFile.setFileName(resultSet.getString("bf.file_name"));
+            boardFile.setBoardSeq(rs.getInt("b.seq"));
+            boardFile.setFilePath(rs.getString("bf.file_path"));
+            boardFile.setModifiedTime(rs.getTimestamp("bf.modified_time"));
+            boardFile.setSeq(rs.getInt("bf.seq"));
+            boardFile.setFileName(rs.getString("bf.file_name"));
+            boardFile.setFileUuid(rs.getString("bf.file_uuid"));
         } catch (SQLException e) {
             e.printStackTrace();
         }

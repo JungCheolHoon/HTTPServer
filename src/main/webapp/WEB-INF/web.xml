@@ -74,6 +74,12 @@
   <servlet>
     <servlet-name>UpdateServlet</servlet-name>
     <servlet-class>kr.co.mz.tutorial.jdbc.servlet.board.UpdateServlet</servlet-class>
+    <multipart-config>
+      <location>/Users/mz01-junghunee/Documents/tutorial_directory</location>
+      <max-file-size>5242880</max-file-size> <!-- 5MB -->
+      <max-request-size>10485760</max-request-size> <!-- 10MB -->
+      <file-size-threshold>0</file-size-threshold>
+    </multipart-config>
   </servlet>
   <servlet-mapping>
     <servlet-name>UpdateServlet</servlet-name>
@@ -86,6 +92,14 @@
   <servlet-mapping>
     <servlet-name>LikesServlet</servlet-name>
     <url-pattern>/likesBoard</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>FileDownloadServlet</servlet-name>
+    <servlet-class>kr.co.mz.tutorial.jdbc.servlet.file.FileDownloadServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>FileDownloadServlet</servlet-name>
+    <url-pattern>/download</url-pattern>
   </servlet-mapping>
   <listener>
     <listener-class>kr.co.mz.tutorial.jdbc.listener.MyServletContextListener</listener-class>

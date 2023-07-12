@@ -15,6 +15,9 @@ public class MainServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        req.setCharacterEncoding("UTF-8");
+        resp.setCharacterEncoding("UTF-8");
+        resp.setContentType("text/html");
         List<Board> boardList;
         try {
             boardList = getBoardList();
@@ -22,8 +25,6 @@ public class MainServlet extends HttpServlet {
             throw new RuntimeException(e);
         }
 
-        resp.setContentType("text/html");
-        resp.setCharacterEncoding("UTF-8");
         PrintWriter out = resp.getWriter();
 
         out.println("<!DOCTYPE html>");
@@ -136,6 +137,6 @@ public class MainServlet extends HttpServlet {
 
     private List<Board> getBoardList() throws SQLException {
         var dataSource = (DataSource) getServletContext().getAttribute("dataSource");
-        return new BoardDao(dataSource).getBoardList();
+        return new BoardDao(dataSource).findAll();
     }
 }

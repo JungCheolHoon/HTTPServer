@@ -17,7 +17,6 @@ public class MyServletContextListener implements ServletContextListener {
             // DataSource 검색
             DataSource dataSource = (DataSource) envContext.lookup("jdbc/hikariDataSource");
             sce.getServletContext().setAttribute("dataSource", dataSource);
-
         } catch (Exception e) {
             e.printStackTrace();
             // 예외 처리

@@ -11,6 +11,8 @@ public class likesServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        req.setCharacterEncoding("UTF-8");
+        resp.setCharacterEncoding("UTF-8");
         if (req.getParameter("likes").equals("1")) {
             var boardSeq = req.getParameter("boardSeq");
             int result = likesCount(Integer.parseInt(boardSeq));
@@ -22,7 +24,8 @@ public class likesServlet extends HttpServlet {
 
     private int likesCount(int boardSeq) {
         var dataSource = (DataSource) getServletContext().getAttribute("dataSource");
-        return new BoardDao(dataSource).likesCount(boardSeq,
-            (int) getServletContext().getAttribute("customerSeq"));
+        return new BoardDao(dataSource).updateOneOfLikesCount(
+            boardSeq, (int) getServletContext().getAttribute("customerSeq")
+        );
     }
 }

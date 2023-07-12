@@ -54,6 +54,10 @@ public class Board extends AbstractModel {
         super.modifiedTime = modified_time;
     }
 
+    public void setBoardFileSet(Set<BoardFile> boardFileSet) {
+        this.boardFileSet = boardFileSet;
+    }
+
     public String getCategory() {
         return category;
     }

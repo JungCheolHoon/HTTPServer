@@ -95,7 +95,6 @@ public class WriteServlet extends HttpServlet {
         out.println("</div>");
         out.println("</body>");
         out.println("</html>");
-
         out.close();
     }
 
@@ -108,16 +107,20 @@ public class WriteServlet extends HttpServlet {
         var title = req.getParameter("title");
         var content = req.getParameter("content");
         var category = req.getParameter("category");
-        var boardFileSet = FileService.fileUpload(req);
+        var boardFileSet = FileService.upload(req.getParts(), 1);
+        if (boardFileSet.isEmpty()) {
+            resp.sendRedirect("/writeBoard");
+            return;
+        }
         try {
             int result = insertBoard(new Board(title, content, category, boardFileSet));
             if (result == 0) {
-                System.out.println("글쓰기에 실패하였습니다.");
+                System.out.println("There are more than 3 attachments");
                 resp.sendRedirect("/main");
             }
             resp.sendRedirect("/viewBoard?boardSeq=" + result);
         } catch (SQLException | IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
 
     }
@@ -126,6 +129,6 @@ public class WriteServlet extends HttpServlet {
         throws SQLException {
         var dataSource = (DataSource) getServletContext().getAttribute("dataSource");
         board.setCustomerSeq((int) getServletContext().getAttribute("customerSeq"));
-        return new BoardDao(dataSource).insertBoard(board);
+        return new BoardDao(dataSource).insertOne(board);
     }
 }

@@ -10,21 +10,27 @@ import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 import kr.co.mz.tutorial.jdbc.db.dao.BoardDao;
 import kr.co.mz.tutorial.jdbc.db.model.Board;
+import kr.co.mz.tutorial.jdbc.db.model.BoardFile;
 import kr.co.mz.tutorial.jdbc.db.model.Comment;
 
 public class ViewServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        Optional<Board> optionalBoard;
+        req.setCharacterEncoding("UTF-8");
+        resp.setCharacterEncoding("UTF-8");
+        Optional<Board> optionalBoard = Optional.empty();
         try {
             optionalBoard = viewBoard(Integer.parseInt(req.getParameter("boardSeq")));
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            System.out.println("The board does not exist : " + e.getMessage());
+            e.printStackTrace();
         }
-
+        if (optionalBoard.isEmpty()) {
+            resp.sendRedirect("/main");
+            return;
+        }
         resp.setContentType("text/html");
-        resp.setCharacterEncoding("UTF-8");
         PrintWriter out = resp.getWriter();
 
         out.println("<!DOCTYPE html>");
@@ -106,48 +112,62 @@ public class ViewServlet extends HttpServlet {
         out.println("</style>");
         out.println("</head>");
         out.println("<body>");
-        if (optionalBoard.isPresent()) {
-            var board = optionalBoard.get();
-            out.println("<form id=\"viewForm\" action=\"/updateBoard\" method=\"post\">");
-            out.println("<input type=\"hidden\" id=\"boardSeq\" name=\"boardSeq\" value=\"" + board.getSeq() + "\">");
+        var board = optionalBoard.get();
+        out.println("<form id=\"viewForm\" action=\"/updateBoard\" method=\"post\" accept-charset=\"UTF-8\">");
+        out.println("<input type=\"hidden\" id=\"boardSeq\" name=\"boardSeq\" value=\"" + board.getSeq() + "\">");
+        out.println(
+            "<div class=\"header\" ><input style='border:none;' class=\"header\" name=\"title\" value=\""
+                + board.getTitle()
+                + "\" readonly/></div>");
+        out.println("<div class=\"content\">");
+        out.println(
+            "<div class=\"author\">작성자: <input class=\"author\" style='border:none;' name=\"customerName\" value=\""
+                + board.getCustomerName()
+                + "\"readonly/></div>");
+        out.println(
+            "<div class=\"author\">카테고리: <input class=\"author\" style='border:none;' name=\"category\" value=\""
+                + board.getCategory()
+                + "\"readonly/></div>");
+        out.println(
+            "<div class=\"date\">작성일: <input class=\"date\" style='border:none;' name=\"modifiedTime\" value=\""
+                + board.getModifiedTime()
+                + "\"readonly/></div>");
+        out.println("<div class=\"likes\">좋아요: <span class=\"likes-count\">");
+        out.println("<input class=\"date\" style='border:none;' name=\"likesCount\" value=\""
+            + board.getLikesCount()
+            + "\"readonly/>" + "</span>");
+        out.println("<a href=\"/likesBoard?boardSeq=" + board.getSeq() + "&&likes=1\" class=\"likes-button\">👍</a>"
+            + "</div>");
+        out.println("<div class=\"likes\">첨부파일: ");
+        var fileCount = 0;
+        for (BoardFile boardFile : board.getBoardFileSet()) {
+            fileCount++;
             out.println(
-                "<div class=\"header\" ><input style='border:none;' class=\"header\" name=\"title\" value=\""
-                    + board.getTitle()
-                    + "\" readonly/></div>");
-            out.println("<div class=\"content\">");
+                "<a style=\"border-radius: 4px; background-color: white; border: none; color:#999;\" href=\"/download?fileUuid="
+                    + boardFile.getFileUuid() + "\">" + boardFile.getFileName()
+                    + "</a> ");
             out.println(
-                "<div class=\"author\">작성자: <input class=\"author\" style='border:none;' name=\"customerName\" value=\""
-                    + board.getCustomerName()
-                    + "\"readonly/></div>");
-            out.println(
-                "<div class=\"author\">카테고리: <input class=\"author\" style='border:none;' name=\"category\" value=\""
-                    + board.getCategory()
-                    + "\"readonly/></div>");
-            out.println(
-                "<div class=\"date\">작성일: <input class=\"date\" style='border:none;' name=\"modifiedTime\" value=\""
-                    + board.getModifiedTime()
-                    + "\"readonly/></div>");
-            out.println(
-                "<div class=\"likes\">좋아요: <span class=\"likes-count\">" + board.getLikesCount() + "</span>"
-                    + "<a href=\"/likesBoard?boardSeq=" + board.getSeq() + "&&likes=1\" class=\"likes-button\">👍</a>"
-                    + "</div>");
-            out.println(
-                "<div style='height:300px; border:0.5px solid;' class=\"body\"><textarea class=\"body\" style='border:none;' name=\"content\" readonly='readonly'>"
-                    + board.getContent() + "</textarea></div>");
-            out.println("</form>");
-            out.println("<div class=\"comment-section\">");
-            out.println(
-                "<input style='text-align:center;font-size:16px;width:100%; height:30px;color:white;height:30px;background-color:#f90; border:none;' value='&nbsp댓글 목록' disabled/>");
-            for (Comment comment : board.getCommentSet()) {
-                out.println(
-                    "<div class=\"comment\"><span style='display:inline-block; width:1500px;'> " + comment.getContent()
-                        + "</span> <span>작성자 : " + comment.getCustomerName() + "</span></div>");
-            }
-            out.println("</div>");
-            out.println("<form action=\"/comment\" method=\"post\">");
-            out.println("<div class=\"comment-form\">");
-            out.println("<input type=\"hidden\" name=\"boardSeq\" value=\"" + board.getSeq() + "\">");
+                "<input type=\"hidden\" name=\"fileName" + fileCount + "\" value=\"" + boardFile.getFileName() + "\">");
         }
+        out.println(
+            "<input type=\"hidden\" name=\"fileCount\" value=\"" + fileCount + "\">");
+        out.println("</div>");
+        out.println(
+            "<div style='height:300px; border:0.5px solid;' class=\"body\"><textarea class=\"body\" style='border:none;' name=\"content\" readonly='readonly'>"
+                + board.getContent() + "</textarea></div>");
+        out.println("</form>");
+        out.println("<div class=\"comment-section\">");
+        out.println(
+            "<input style='text-align:center;font-size:16px;width:100%; height:30px;color:white;height:30px;background-color:#f90; border:none;' value='&nbsp댓글 목록' disabled/>");
+        for (Comment comment : board.getCommentSet()) {
+            out.println(
+                "<div class=\"comment\"><span style='display:inline-block; width:1500px;'> " + comment.getContent()
+                    + "</span> <span>작성자 : " + comment.getCustomerName() + "</span></div>");
+        }
+        out.println("</div>");
+        out.println("<form action=\"/comment\" method=\"post\" accept-charset=\"UTF-8\">");
+        out.println("<div class=\"comment-form\">");
+        out.println("<input type=\"hidden\" name=\"boardSeq\" value=\"" + board.getSeq() + "\">");
         out.println("<span class=\"buttons\">");
         out.println("<input style=\"width:1660px;\" name=\"content\" placeholder=\"댓글을 입력하세요\"></input>");
         out.println(
@@ -184,17 +204,11 @@ public class ViewServlet extends HttpServlet {
         out.println("</script>");
         out.println("</body>");
         out.println("</html>");
-
         out.close();
-        if (optionalBoard.isEmpty()) {
-            resp.sendRedirect("/main");
-        }
     }
 
     private Optional<Board> viewBoard(int boardSeq) throws SQLException {
         var dataSource = (DataSource) getServletContext().getAttribute("dataSource");
-        return new BoardDao(dataSource).getBoard(boardSeq);
+        return new BoardDao(dataSource).findOne(boardSeq);
     }
-
-
 }

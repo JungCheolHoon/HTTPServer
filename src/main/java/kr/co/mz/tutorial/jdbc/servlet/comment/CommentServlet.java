@@ -13,13 +13,14 @@ public class CommentServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         req.setCharacterEncoding("UTF-8");
+        resp.setCharacterEncoding("UTF-8");
         var content = req.getParameter("content");
         var customerSeq = (int) getServletContext().getAttribute("customerSeq");
         var boardSeq = Integer.parseInt(req.getParameter("boardSeq"));
         try {
             var result = insertComment(content, customerSeq, boardSeq);
             if (result == 0) {
-                System.out.println("댓글 작성에 실패하였습니다.");
+                System.out.println("Failed Insert One Comment");
             }
             resp.sendRedirect("/viewBoard?boardSeq=" + boardSeq);
         } catch (SQLException e) {
@@ -29,6 +30,6 @@ public class CommentServlet extends HttpServlet {
 
     private int insertComment(String content, int customerSeq, int boardSeq) throws SQLException {
         var dataSource = (DataSource) getServletContext().getAttribute("dataSource");
-        return new CommentDao(dataSource).insertComment(content, customerSeq, boardSeq);
+        return new CommentDao(dataSource).insertOne(content, customerSeq, boardSeq);
     }
 }

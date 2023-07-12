@@ -15,6 +15,8 @@ public class JoinServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
+        resp.setCharacterEncoding("UTF-8");
         resp.setContentType("text/html");
         PrintWriter out = resp.getWriter();
 
@@ -99,8 +101,8 @@ public class JoinServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
         req.setCharacterEncoding("UTF-8");
+        resp.setContentType("UTF-8");
         var customer = new Customer(req.getParameter("username"), req.getParameter("password")
             , req.getParameter("name"), req.getParameter("address"));
         try {

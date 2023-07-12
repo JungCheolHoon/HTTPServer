@@ -1,6 +1,5 @@
 package kr.co.mz.tutorial.jdbc.db.dao.init;
 
-import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -20,10 +19,10 @@ public class CreateBoard {
 
     public static void main(String[] args) throws SQLException, IOException {
         var board = new Board("안녕하십니까!", "반가워요~", 3, "");
-        String fileDirectoryName = FileService.BASIC_DIRECTORY + FileService.generateFileDirectoryName();
+        String fileDirectoryName = FileService.BASIC_DIRECTORY + FileService.generateDirectoryName();
         board.addBoardFile(
             new BoardFile(UUID.randomUUID().toString(), "직박구리부리박기.txt",
-                fileDirectoryName + File.separator + "직박구리부리박기.txt",
+                fileDirectoryName + java.io.File.separator + "직박구리부리박기.txt",
                 999, "txt"
             )
         );
