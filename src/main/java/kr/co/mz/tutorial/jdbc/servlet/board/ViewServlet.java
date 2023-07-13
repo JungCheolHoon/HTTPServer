@@ -1,5 +1,7 @@
 package kr.co.mz.tutorial.jdbc.servlet.board;
 
+import static kr.co.mz.tutorial.jdbc.Constants.DATASOURCE_CONTEXT_KEY;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -17,17 +19,17 @@ public class ViewServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        req.setCharacterEncoding("UTF-8");
-        resp.setCharacterEncoding("UTF-8");
+        var uriArr = req.getRequestURI().split("/");
+        var boardSeq = uriArr[uriArr.length - 1];
         Optional<Board> optionalBoard = Optional.empty();
         try {
-            optionalBoard = viewBoard(Integer.parseInt(req.getParameter("boardSeq")));
+            optionalBoard = viewBoard(Integer.parseInt(boardSeq));
         } catch (SQLException e) {
             System.out.println("The board does not exist : " + e.getMessage());
             e.printStackTrace();
         }
         if (optionalBoard.isEmpty()) {
-            resp.sendRedirect("/main");
+            resp.sendRedirect("/board");
             return;
         }
         resp.setContentType("text/html");
@@ -113,7 +115,8 @@ public class ViewServlet extends HttpServlet {
         out.println("</head>");
         out.println("<body>");
         var board = optionalBoard.get();
-        out.println("<form id=\"viewForm\" action=\"/updateBoard\" method=\"post\" accept-charset=\"UTF-8\">");
+        out.println("<form id=\"viewForm\" action=\"/board/" + boardSeq
+            + "/update\" method=\"post\" accept-charset=\"UTF-8\">");
         out.println("<input type=\"hidden\" id=\"boardSeq\" name=\"boardSeq\" value=\"" + board.getSeq() + "\">");
         out.println(
             "<div class=\"header\" ><input style='border:none;' class=\"header\" name=\"title\" value=\""
@@ -136,14 +139,14 @@ public class ViewServlet extends HttpServlet {
         out.println("<input class=\"date\" style='border:none;' name=\"likesCount\" value=\""
             + board.getLikesCount()
             + "\"readonly/>" + "</span>");
-        out.println("<a href=\"/likesBoard?boardSeq=" + board.getSeq() + "&&likes=1\" class=\"likes-button\">👍</a>"
+        out.println("<a href=\"/board/" + board.getSeq() + "/likes?likes=1\" class=\"likes-button\">👍</a>"
             + "</div>");
         out.println("<div class=\"likes\">첨부파일: ");
         var fileCount = 0;
         for (BoardFile boardFile : board.getBoardFileSet()) {
             fileCount++;
             out.println(
-                "<a style=\"border-radius: 4px; background-color: white; border: none; color:#999;\" href=\"/download?fileUuid="
+                "<a style=\"border-radius: 4px; background-color: white; border: none; color:#999;\" href=\"/board/*/download?fileUuid="
                     + boardFile.getFileUuid() + "\">" + boardFile.getFileName()
                     + "</a> ");
             out.println(
@@ -165,7 +168,7 @@ public class ViewServlet extends HttpServlet {
                     + "</span> <span>작성자 : " + comment.getCustomerName() + "</span></div>");
         }
         out.println("</div>");
-        out.println("<form action=\"/comment\" method=\"post\" accept-charset=\"UTF-8\">");
+        out.println("<form action=\"/board/" + boardSeq + "/comment\" method=\"post\" accept-charset=\"UTF-8\">");
         out.println("<div class=\"comment-form\">");
         out.println("<input type=\"hidden\" name=\"boardSeq\" value=\"" + board.getSeq() + "\">");
         out.println("<span class=\"buttons\">");
@@ -176,7 +179,7 @@ public class ViewServlet extends HttpServlet {
         out.println("</div>");
         out.println("</form>");
         out.println("<div class=\"buttons\">");
-        out.println("<a href=\"/main\">게시글 리스트로 돌아가기</a>");
+        out.println("<a href=\"/board\">게시글 리스트로 돌아가기</a>");
         out.println("<a id=\"deleteButton\" style='float: right' href=\"#\">게시글 삭제</a>");
         out.println(
             "<a style='float: right' href=\"#\" onclick=\"document.getElementById('viewForm').submit(); return false;\">게시글 수정</a>");
@@ -189,12 +192,12 @@ public class ViewServlet extends HttpServlet {
         out.println("  event.preventDefault();"); // 기본 동작 방지
         out.println("  const boardSeq = boardSeqInput.value;");
         out.println("  const xhr = new XMLHttpRequest();");
-        out.println("  xhr.open('DELETE', '/deleteBoard/' + boardSeq, true);");
+        out.println("  xhr.open('DELETE', '/board/delete/' + boardSeq, true);");
         out.println("  xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');");
         out.println("  xhr.onload = function () {");
         out.println("    if (xhr.status === 200) {");
         out.println("      console.log('게시글 삭제 성공');");
-        out.println("      window.location.href = '/main';"); // 게시글 목록 페이지로 이동
+        out.println("      window.location.href = '/board';"); // 게시글 목록 페이지로 이동
         out.println("    } else {");
         out.println("      console.error('게시글 삭제 실패');");
         out.println("    }");
@@ -208,7 +211,7 @@ public class ViewServlet extends HttpServlet {
     }
 
     private Optional<Board> viewBoard(int boardSeq) throws SQLException {
-        var dataSource = (DataSource) getServletContext().getAttribute("dataSource");
+        var dataSource = (DataSource) getServletContext().getAttribute(DATASOURCE_CONTEXT_KEY);
         return new BoardDao(dataSource).findOne(boardSeq);
     }
 }

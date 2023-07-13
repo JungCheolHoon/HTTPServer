@@ -1,5 +1,7 @@
 package kr.co.mz.tutorial.jdbc.servlet.board;
 
+import static kr.co.mz.tutorial.jdbc.Constants.DATASOURCE_CONTEXT_KEY;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -25,13 +27,13 @@ public class DeleteServlet extends HttpServlet {
     }
 
     private int deleteBoard(int boardSeq) {
-        var dataSource = (DataSource) getServletContext().getAttribute("dataSource");
+        var dataSource = (DataSource) getServletContext().getAttribute(DATASOURCE_CONTEXT_KEY);
         Optional<List<String>> filePathOptional = new BoardDao(dataSource).deleteOne(boardSeq);
         int numberOfFiles = 0;
         if (filePathOptional.isPresent()) {
             List<String> filePathList = filePathOptional.get();
             for (String filePath : filePathList) {
-                boolean flag = FileService.delete(filePath);
+                boolean flag = new FileService().delete(filePath);
                 if (flag) {
                     System.out.println("Success Delete File on Server Storage : " + filePath);
                 }

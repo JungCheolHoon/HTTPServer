@@ -19,7 +19,7 @@ public class CreateBoardFile {
         System.out.println("쿼리 성공한 행수 : " + createBoardFile(
                 dataSource.getConnection(),
                 new BoardFile(UUID.randomUUID().toString(), "감나비부리박기.txt",
-                    FileService.BASIC_DIRECTORY + FileService.generateDirectoryName() + "/감나비잔나비.txt",
+                    FileService.BASIC_DIRECTORY + new FileService().generateDirectoryName() + "/감나비잔나비.txt",
                     999, "txt"
                 )
             )
@@ -29,7 +29,7 @@ public class CreateBoardFile {
     public static int createBoardFile(Connection connection, BoardFile boardFile)
         throws SQLException {
         String fileDirectoryName =
-            FileService.generateDirectoryName() + java.io.File.separator + boardFile.getFileName();
+            new FileService().generateDirectoryName() + java.io.File.separator + boardFile.getFileName();
         try (
             var preparedStatement = connection.prepareStatement(QUERY);
         ) {

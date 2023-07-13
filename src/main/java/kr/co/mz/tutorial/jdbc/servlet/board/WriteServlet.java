@@ -1,5 +1,8 @@
 package kr.co.mz.tutorial.jdbc.servlet.board;
 
+import static kr.co.mz.tutorial.jdbc.Constants.CUSTOMER_IN_SESSION;
+import static kr.co.mz.tutorial.jdbc.Constants.DATASOURCE_CONTEXT_KEY;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -9,8 +12,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
+import kr.co.mz.tutorial.jdbc.SessionExpiredException;
 import kr.co.mz.tutorial.jdbc.db.dao.BoardDao;
 import kr.co.mz.tutorial.jdbc.db.model.Board;
+import kr.co.mz.tutorial.jdbc.db.model.Customer;
 import kr.co.mz.tutorial.jdbc.file.FileService;
 
 public class WriteServlet extends HttpServlet {
@@ -18,7 +23,6 @@ public class WriteServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("text/html");
-        resp.setCharacterEncoding("UTF-8");
         PrintWriter out = resp.getWriter();
 
         out.println("<!DOCTYPE html>");
@@ -75,7 +79,7 @@ public class WriteServlet extends HttpServlet {
         out.println("<h1>게 시 판</h1>");
         out.println("<div class=\"write-form\">");
         out.println(
-            "  <form action=\"/writeBoard\" method=\"post\" enctype=\"multipart/form-data\" accept-charset=\"UTF-8\">");
+            "  <form action=\"/board/write\" method=\"post\" enctype=\"multipart/form-data\" accept-charset=\"UTF-8\">");
         out.println("    <label for=\"title\">제목:</label>");
         out.println("    <input type=\"text\" id=\"title\" name=\"title\"><br>");
         out.println("    <label for=\"content\">내용:</label>");
@@ -100,35 +104,40 @@ public class WriteServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
-        if (Optional.ofNullable(getServletContext().getAttribute("customerSeq")).isEmpty()) {
-            resp.sendRedirect("/main");
+        var customer = (Customer) req.getSession().getAttribute(CUSTOMER_IN_SESSION);
+        if (customer == null) {
+            throw new SessionExpiredException();
         }
-        req.setCharacterEncoding("UTF-8");
+        if (Optional.ofNullable(getServletContext().getAttribute("customerSeq")).isEmpty()) {
+            resp.sendRedirect("/board");
+            return;
+        }
         var title = req.getParameter("title");
         var content = req.getParameter("content");
         var category = req.getParameter("category");
-        var boardFileSet = FileService.upload(req.getParts(), 1);
-        if (boardFileSet.isEmpty()) {
-            resp.sendRedirect("/writeBoard");
+        var boardFileSet = new FileService().upload(req.getParts(), 1);
+        if (boardFileSet == null) {
+            resp.sendRedirect("/board/write");
             return;
         }
         try {
-            int result = insertBoard(new Board(title, content, category, boardFileSet));
+            int result = insertBoard(new Board(title, content, category, boardFileSet), customer);
             if (result == 0) {
                 System.out.println("There are more than 3 attachments");
-                resp.sendRedirect("/main");
+                resp.sendRedirect("/board");
+                return;
             }
-            resp.sendRedirect("/viewBoard?boardSeq=" + result);
+            resp.sendRedirect("/board/" + result);
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
 
     }
 
-    private int insertBoard(Board board)
+    private int insertBoard(Board board, Customer customer)
         throws SQLException {
-        var dataSource = (DataSource) getServletContext().getAttribute("dataSource");
-        board.setCustomerSeq((int) getServletContext().getAttribute("customerSeq"));
+        var dataSource = (DataSource) getServletContext().getAttribute(DATASOURCE_CONTEXT_KEY);
+        board.setCustomerSeq(customer.getSeq());
         return new BoardDao(dataSource).insertOne(board);
     }
 }

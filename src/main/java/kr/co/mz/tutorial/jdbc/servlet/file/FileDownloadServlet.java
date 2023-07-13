@@ -1,5 +1,7 @@
 package kr.co.mz.tutorial.jdbc.servlet.file;
 
+import static kr.co.mz.tutorial.jdbc.Constants.DATASOURCE_CONTEXT_KEY;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -28,7 +30,7 @@ public class FileDownloadServlet extends HttpServlet {
         }
         if (optionalBoardFile.isPresent()) {
             var boardFile = optionalBoardFile.get();
-            resp.setContentType(FileService.getMimeType(boardFile.getFileName()));
+            resp.setContentType(new FileService().getMimeType(boardFile.getFileName()));
             String encodeFileName = URLEncoder.encode(boardFile.getFileName(), StandardCharsets.UTF_8);
             String header = "attachment; filename=" + encodeFileName;
             resp.setHeader("Content-Disposition", header);
@@ -46,7 +48,7 @@ public class FileDownloadServlet extends HttpServlet {
     }
 
     private Optional<BoardFile> findFilePath(String fileUuid) throws SQLException {
-        var dataSource = (DataSource) getServletContext().getAttribute("dataSource");
+        var dataSource = (DataSource) getServletContext().getAttribute(DATASOURCE_CONTEXT_KEY);
         return new BoardFileDao(dataSource).findOneFromFileUuid(fileUuid);
     }
 }

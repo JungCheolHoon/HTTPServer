@@ -1,5 +1,8 @@
 package kr.co.mz.tutorial.jdbc.listener;
 
+import static kr.co.mz.tutorial.jdbc.Constants.DATASOURCE_CONTEXT_KEY;
+
+import com.zaxxer.hikari.HikariDataSource;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.servlet.ServletContextEvent;
@@ -16,7 +19,7 @@ public class MyServletContextListener implements ServletContextListener {
             Context envContext = (Context) initContext.lookup("java:/comp/env");
             // DataSource 검색
             DataSource dataSource = (DataSource) envContext.lookup("jdbc/hikariDataSource");
-            sce.getServletContext().setAttribute("dataSource", dataSource);
+            sce.getServletContext().setAttribute(DATASOURCE_CONTEXT_KEY, dataSource);
         } catch (Exception e) {
             e.printStackTrace();
             // 예외 처리
@@ -25,5 +28,7 @@ public class MyServletContextListener implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
+        var dataSource = (HikariDataSource) sce.getServletContext().getAttribute(DATASOURCE_CONTEXT_KEY);
+        dataSource.close();
     }
 }

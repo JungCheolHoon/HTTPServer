@@ -1,23 +1,25 @@
 package kr.co.mz.tutorial.jdbc.db.dao;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import javax.sql.DataSource;
+import java.util.Optional;
+import kr.co.mz.tutorial.jdbc.DatabaseAccessException;
 import kr.co.mz.tutorial.jdbc.db.model.Customer;
 
 public class LoginDao {
 
-    private final DataSource dataSource;
+    private final Connection connection;
 
-    public LoginDao(DataSource dataSource) {
-        this.dataSource = dataSource;
+    public LoginDao(Connection connection) {
+        this.connection = connection;
     }
 
     public int existCustomer(String username, String password) throws SQLException {
         var query = "select seq from customer where customer_id=? and password=?";
+        System.out.println("QUERY:::" + query);
         try (
-            var connection = dataSource.getConnection();
             PreparedStatement ps = connection.prepareStatement(query)
         ) {
             ps.setString(1, username);
@@ -34,7 +36,6 @@ public class LoginDao {
     public int joinCustomer(Customer customer) throws SQLException {
         var query = "insert into Customer(customer_id,password,name,address) values(?,?,?,?)";
         try (
-            var connection = dataSource.getConnection();
             PreparedStatement ps = connection.prepareStatement(query)
         ) {
             ps.setString(1, customer.getCustomerId());
@@ -49,4 +50,21 @@ public class LoginDao {
         }
     }
 
+    public Optional<Customer> findByUsername(String username) {
+        final String query = "select * from customer where customer_id = ?";
+
+        try (
+            PreparedStatement ps = connection.prepareStatement(query)
+        ) {
+            ps.setString(1, username);
+            var rs = ps.executeQuery();
+            Customer customer = null;
+            if (rs.next()) {
+                customer = Customer.fromResultSet(rs);
+            }
+            return Optional.ofNullable(customer);
+        } catch (SQLException sqle) {
+            throw new DatabaseAccessException("데이터베이스 관련 처리에 오류가 발생하였습니다:" + sqle.getMessage(), sqle);
+        }
+    }
 }

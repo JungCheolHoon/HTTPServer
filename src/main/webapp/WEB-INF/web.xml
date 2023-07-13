@@ -18,14 +18,6 @@
     <url-pattern>/</url-pattern>
   </servlet-mapping>
   <servlet>
-    <servlet-name>MainServlet</servlet-name>
-    <servlet-class>kr.co.mz.tutorial.jdbc.servlet.MainServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>MainServlet</servlet-name>
-    <url-pattern>/main</url-pattern>
-  </servlet-mapping>
-  <servlet>
     <servlet-name>JoinServlet</servlet-name>
     <servlet-class>kr.co.mz.tutorial.jdbc.servlet.customer.JoinServlet</servlet-class>
   </servlet>
@@ -34,12 +26,20 @@
     <url-pattern>/join</url-pattern>
   </servlet-mapping>
   <servlet>
+    <servlet-name>MainServlet</servlet-name>
+    <servlet-class>kr.co.mz.tutorial.jdbc.servlet.BoardServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MainServlet</servlet-name>
+    <url-pattern>/board</url-pattern>
+  </servlet-mapping>
+  <servlet>
     <servlet-name>ViewServlet</servlet-name>
     <servlet-class>kr.co.mz.tutorial.jdbc.servlet.board.ViewServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>ViewServlet</servlet-name>
-    <url-pattern>/viewBoard</url-pattern>
+    <url-pattern>/board/*</url-pattern>
   </servlet-mapping>
   <servlet>
     <servlet-name>CommentServlet</servlet-name>
@@ -47,7 +47,7 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>CommentServlet</servlet-name>
-    <url-pattern>/comment</url-pattern>
+    <url-pattern>/board/*/comment</url-pattern>
   </servlet-mapping>
   <servlet>
     <servlet-name>WriteServlet</servlet-name>
@@ -61,7 +61,7 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>WriteServlet</servlet-name>
-    <url-pattern>/writeBoard</url-pattern>
+    <url-pattern>/board/write</url-pattern>
   </servlet-mapping>
   <servlet>
     <servlet-name>DeleteServlet</servlet-name>
@@ -69,7 +69,7 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>DeleteServlet</servlet-name>
-    <url-pattern>/deleteBoard/*</url-pattern>
+    <url-pattern>/board/delete/*</url-pattern>
   </servlet-mapping>
   <servlet>
     <servlet-name>UpdateServlet</servlet-name>
@@ -83,15 +83,15 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>UpdateServlet</servlet-name>
-    <url-pattern>/updateBoard</url-pattern>
+    <url-pattern>/board/*/update</url-pattern>
   </servlet-mapping>
   <servlet>
     <servlet-name>LikesServlet</servlet-name>
-    <servlet-class>kr.co.mz.tutorial.jdbc.servlet.board.likesServlet</servlet-class>
+    <servlet-class>kr.co.mz.tutorial.jdbc.servlet.board.LikesServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>LikesServlet</servlet-name>
-    <url-pattern>/likesBoard</url-pattern>
+    <url-pattern>/board/*/likes</url-pattern>
   </servlet-mapping>
   <servlet>
     <servlet-name>FileDownloadServlet</servlet-name>
@@ -99,18 +99,27 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>FileDownloadServlet</servlet-name>
-    <url-pattern>/download</url-pattern>
+    <url-pattern>/board/*/download</url-pattern>
   </servlet-mapping>
   <listener>
     <listener-class>kr.co.mz.tutorial.jdbc.listener.MyServletContextListener</listener-class>
   </listener>
   <filter>
     <filter-name>loggingFilter</filter-name>
-    <filter-class>kr.co.mz.tutorial.jdbc.filter.AuthenticationFilter</filter-class>
+    <filter-class>kr.co.mz.tutorial.jdbc.filter.ServletFilter</filter-class>
   </filter>
   <filter-mapping>
     <filter-name>loggingFilter</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
+  <error-page>
+    <exception-type>kr.co.mz.tutorial.jdbc.AlertException</exception-type>
+    <location>/WEB-INF/jsp/alert.jsp</location>
+  </error-page>
+
+  <error-page>
+    <error-code>500</error-code>
+    <location>/WEB-INF/jsp/error.jsp</location>
+  </error-page>
 
 </web-app>

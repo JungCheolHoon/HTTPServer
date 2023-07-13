@@ -1,5 +1,7 @@
 package kr.co.mz.tutorial.jdbc.servlet.board;
 
+import static kr.co.mz.tutorial.jdbc.Constants.DATASOURCE_CONTEXT_KEY;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -17,14 +19,13 @@ public class UpdateServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        req.setCharacterEncoding("UTF-8");
-        resp.setCharacterEncoding("UTF-8");
         var optionalUpdateView = Optional.ofNullable(req.getParameter("update"));
+        var boardSeq = req.getParameter("boardSeq");
         if (optionalUpdateView.isPresent()) {
             int result = 0;
             try {
                 result = updateBoard(
-                    new Board(Integer.parseInt(req.getParameter("boardSeq")), req.getParameter("title"),
+                    new Board(Integer.parseInt(boardSeq), req.getParameter("title"),
                         req.getParameter("content")
                         , req.getParameter("category")), req);
             } catch (ServletException | SQLException e) {
@@ -36,7 +37,7 @@ public class UpdateServlet extends HttpServlet {
             } else {
                 System.out.println("게시글 수정에 실패하였습니다.");
             }
-            resp.sendRedirect("/viewBoard?boardSeq=" + req.getParameter("boardSeq"));
+            resp.sendRedirect("/board/" + boardSeq);
             return;
         }
 
@@ -123,9 +124,11 @@ public class UpdateServlet extends HttpServlet {
         out.println("</head>");
         out.println("<body>");
         out.println(
-            "<form id=\"viewForm\" action=\"/updateBoard?update=1\" method=\"post\" accept-charset=\"UTF-8\" "
+            "<form id=\"viewForm\" action=\"/board/" + boardSeq
+                + "/update\" method=\"post\" accept-charset=\"UTF-8\" "
                 + "enctype=\"multipart/form-data\">");
         out.println("<input type=\"hidden\" name=\"boardSeq\" value=\"" + req.getParameter("boardSeq") + "\">");
+        out.println("<input type=\"hidden\" name=\"update\" value=\"1\">");
         out.println(
             "<div class=\"header\" name=\"title\"><input style='border:none;' class=\"header\" name=\"title\" value=\""
                 + req.getParameter("title")
@@ -155,7 +158,7 @@ public class UpdateServlet extends HttpServlet {
                 + req.getParameter("content") + "</textarea></div>");
         out.println("</form>");
         out.println("<div class=\"buttons\">");
-        out.println("<a href=\"/main\">게시글 리스트로 돌아가기</a>");
+        out.println("<a href=\"/board\">게시글 리스트로 돌아가기</a>");
         out.println(
             "<a style='float: right' href=\"#\" onclick=\"document.getElementById('viewForm').submit(); return false;\">확인</a>");
         out.println("</div>");
@@ -167,11 +170,12 @@ public class UpdateServlet extends HttpServlet {
     }
 
     private int updateBoard(Board board, HttpServletRequest req) throws ServletException, IOException, SQLException {
-        var dataSource = (DataSource) getServletContext().getAttribute("dataSource");
+        var dataSource = (DataSource) getServletContext().getAttribute(DATASOURCE_CONTEXT_KEY);
+        var fileService = new FileService();
         var parts = req.getParts();
         var writeYN = 0;
-        var boardFileSet = FileService.upload(parts, writeYN);
-        if (boardFileSet.isEmpty()) {
+        var boardFileSet = fileService.upload(parts, writeYN);
+        if (boardFileSet == null) {
             System.out.println("There are more than 3 attachments");
             return 0;
         }
@@ -181,9 +185,9 @@ public class UpdateServlet extends HttpServlet {
             var filePathList = optionalFilePathList.get();
             writeYN = 1;
             for (String filePath : filePathList) {
-                FileService.delete(filePath);
+                fileService.delete(filePath);
             }
-            FileService.upload(parts, writeYN);
+            fileService.upload(parts, writeYN);
         }
         return 1;
     }

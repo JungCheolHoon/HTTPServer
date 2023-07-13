@@ -19,7 +19,7 @@ public class FileService {
 
     public static final String BASIC_DIRECTORY = "/Users/mz01-junghunee/Documents/tutorial_directory/";
 
-    public static void createDirectory() {
+    public void createDirectory() {
         java.io.File fileDirectory = new java.io.File(generateDirectoryName());
         if (!fileDirectory.exists()) {
             boolean flag = fileDirectory.mkdirs();
@@ -31,16 +31,16 @@ public class FileService {
         }
     }
 
-    public static String generateDirectoryName() {
+    public String generateDirectoryName() {
         return BASIC_DIRECTORY + LocalDateTime.now().toLocalDate().toString().substring(0, 10);
     }
 
-    public static Set<BoardFile> upload(Collection<Part> parts, int writeYN) throws IOException {
+    public Set<BoardFile> upload(Collection<Part> parts, int writeYN) throws IOException {
         String uploadPath = generateDirectoryName();
         createDirectory();
         Set<BoardFile> boardFileSet = new HashSet<>();
         if (fileCount(parts) > 3) {
-            return boardFileSet;
+            return null;
         }
         for (Part part : parts) {
             Optional<String> optionalFileName = getName(part);
@@ -59,7 +59,7 @@ public class FileService {
         return boardFileSet;
     }
 
-    private static int fileCount(Collection<Part> parts) {
+    private int fileCount(Collection<Part> parts) {
         int fileCount = 0;
         for (Part part : parts) {
             Optional<String> optionalFileName = getName(part);
@@ -70,7 +70,7 @@ public class FileService {
         return fileCount;
     }
 
-    private static Optional<String> getName(Part part) {
+    private Optional<String> getName(Part part) {
         String contentDisposition = part.getHeader("content-disposition");
         String[] elements = contentDisposition.split(";");
         String fileName = null;
@@ -82,7 +82,7 @@ public class FileService {
         return Optional.ofNullable(fileName);
     }
 
-    public static boolean delete(String filePath) {
+    public boolean delete(String filePath) {
         File file = new File(filePath);
         boolean flag = false;
         try {
@@ -100,7 +100,7 @@ public class FileService {
         return flag;
     }
 
-    public static String getMimeType(String fileName) {
+    public String getMimeType(String fileName) {
         Path filePath = Paths.get(fileName);
         String mimeType;
         FileNameMap fileNameMap = URLConnection.getFileNameMap();

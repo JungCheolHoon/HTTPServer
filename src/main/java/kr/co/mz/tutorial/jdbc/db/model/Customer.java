@@ -1,5 +1,8 @@
 package kr.co.mz.tutorial.jdbc.db.model;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 public class Customer {
 
     private int seq;
@@ -54,4 +57,17 @@ public class Customer {
     public void setAddress(String address) {
         this.address = address;
     }
+
+    public static Customer fromResultSet(ResultSet rs) throws SQLException {
+        var customer = new Customer(
+            rs.getString("customer_id"),
+            rs.getString("name"),
+            rs.getString("password"),
+            rs.getString("address")
+        );
+        customer.setSeq(rs.getInt("seq"));
+
+        return customer;
+    }
+
 }

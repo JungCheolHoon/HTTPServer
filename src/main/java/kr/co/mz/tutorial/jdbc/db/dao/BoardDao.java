@@ -70,6 +70,25 @@ public class BoardDao {
         }
     }
 
+    public List<Board> findAny(String category) throws SQLException {
+        var query = "select * from Board b left join customer c on b.customer_seq = c.seq where category=?";
+        try (var connection = dataSource.getConnection();
+            var ps = connection.prepareStatement(query)) {
+            ps.setString(1, category);
+            var rs = ps.executeQuery();
+            var boardList = new ArrayList<Board>();
+            while (rs.next()) {
+                var board = Board.fromResultSet(rs);
+                boardList.add(board);
+            }
+            int rows = boardList.size();
+            if (rows != 0) {
+                System.out.println("Successful Find Any Board! Rows : " + rows);
+            }
+            return boardList;
+        }
+    }
+
     public int insertOne(Board board) throws SQLException {
         var query = "insert into board(title,content,customer_seq,category) values(?,?,?,?)";
         Connection connection = null;
