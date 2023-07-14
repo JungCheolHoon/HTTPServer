@@ -71,8 +71,34 @@ public class BoardServlet extends HttpServlet {
         tr, td {
           text-align: center;
         }
+        .pagination {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            overflow-x: auto;
+            white-space: nowrap;
+            justify-content: center;
+          }
+                
+          .pagination li {
+            margin-right: 5px;
+          }
+                
+          .pagination li a {
+            display: inline-block;
+            padding: 5px 10px;
+            text-decoration: none;
+            color: #333;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+          }
+                
+          .pagination li a.active {
+            font-weight: bold;
+            background-color: #f90;
+            color: #fff;
+          }
         // 추가적인 CSS 코드 작성
-
         </style>
         <script>
         // JavaScript 코드
@@ -100,11 +126,18 @@ public class BoardServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         List<Board> boardList;
+        var blockNum = req.getParameter("blockNum") == null ? 1 : Integer.parseInt(req.getParameter("blockNum"));
+        var page = req.getParameter("page") == null ? 1 : Integer.parseInt(req.getParameter("page"));
         try (var connection = dataSource.getConnection()) {
             boardList = new BoardService(connection).getAll();
         } catch (SQLException sqle) {
             throw new DatabaseAccessException(sqle);
         }
+        var onePageMaxNum = 10;
+        // 1 > 1~10         2> 11~20        3> 21~30
+        // pageNum(boardCount)-(boardCount-1) ~ pageNum(boardCount)
+        double pageCount = 0;
+        var maxPageCount = 5;
 
         resp.setContentType("text/html");
         PrintWriter out = resp.getWriter();
@@ -128,21 +161,47 @@ public class BoardServlet extends HttpServlet {
         out.println("  </tr>");
         out.println("  </thead>");
         out.println("  <tbody>");
+        var boardSize = 0;
         if (boardList != null && !boardList.isEmpty()) {
-            var count = 1;
+            boardSize = boardList.size();
+            var count = 0;
+            var index = 1;
+            var startSize = page * onePageMaxNum - (onePageMaxNum - 1);
+            var endSize = Math.min(page * onePageMaxNum, boardList.size());
             for (Board board : boardList) {
-                out.println("  <tr>");
-                out.println("    <td>" + count + "</td>");
-                out.println("    <td><a href=\"/board/view?boardSeq=" + board.getSeq() + "\">" + board.getTitle()
-                    + "</a></td>"); // href 닫는 따옴표 추가
-                out.println("    <td>" + board.getCustomerName() + "</td>");
-                out.println("    <td>" + board.getModifiedTime() + "</td>");
-                out.println("  </tr>");
-                count++;
+                if (startSize <= index && endSize >= index) {
+                    out.println("  <tr>");
+                    out.println("    <td>" + (count + 1) + "</td>");
+                    out.println("    <td><a href=\"/board/view?boardSeq=" + board.getSeq() + "\">" + board.getTitle()
+                        + "</a></td>"); // href 닫는 따옴표 추가
+                    out.println("    <td>" + board.getCustomerName() + "</td>");
+                    out.println("    <td>" + board.getModifiedTime() + "</td>");
+                    out.println("  </tr>");
+                    count++;
+                }
+                index++;
             }
+            pageCount = Math.ceil((double) boardList.size() / onePageMaxNum);
         }
         out.println("  </tbody>");
         out.println("</table>");
+        out.println("<ul class=\"pagination\">");
+        if (blockNum > 1) {
+            out.println("<li><a href=\"/board?page=" + (blockNum - 1) + "\">←</a></li>");
+        }
+        var maxBlockNum = pageCount > maxPageCount * blockNum ? maxPageCount * blockNum : pageCount;
+        System.out.println(maxBlockNum);
+        System.out.println((blockNum - 1) * (int) maxPageCount);
+        for (int i = (blockNum - 1) * (int) maxPageCount; i < maxBlockNum; i++) {
+            out.println("<li><a href=\"/board?blockNum=" + blockNum + "&&page=" + (i + 1) + "\">" + (i + 1)
+                + "</a></li>");
+        }
+
+        if (blockNum * maxPageCount * onePageMaxNum < boardSize) {
+            out.println("<li><a href=\"/board?blockNum=" + (blockNum + 1) + "&&page=" + (blockNum * maxPageCount + 1)
+                + "\">→</a></li>");
+        }
+        out.println("</ul>");
         out.println("<div class=\"write-post\">");
         out.println("  <a href=\"/board/write\">글쓰기</a>");
         out.println("</div>");
@@ -155,6 +214,7 @@ public class BoardServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        var page = req.getParameter("page") == null ? 1 : Integer.parseInt(req.getParameter("page"));
         var category = req.getParameter("category");
         validateInputParameter(category);
         List<Board> boardList;
@@ -163,6 +223,11 @@ public class BoardServlet extends HttpServlet {
         } catch (SQLException sqle) {
             throw new DatabaseAccessException(sqle);
         }
+        var onePageMaxNum = 10;
+        // 1 > 1~10         2> 11~20        3> 21~30
+        // pageNum(boardCount)-(boardCount-1) ~ pageNum(boardCount)
+        double pageCount = 0;
+        var maxPageCount = 5;
         resp.setContentType("text/html");
         PrintWriter out = resp.getWriter();
 
@@ -192,19 +257,36 @@ public class BoardServlet extends HttpServlet {
         out.println("  </thead>");
         out.println("  <tbody>");
         if (boardList != null && !boardList.isEmpty()) {
-            var count = 1;
+            var count = 0;
+            var index = 1;
+            var startSize = page * onePageMaxNum - (onePageMaxNum - 1) < boardList.size() ? 1
+                : page * onePageMaxNum - (onePageMaxNum - 1);
+            var endSize = Math.min(page * onePageMaxNum, boardList.size());
             for (Board board : boardList) {
-                out.println("  <tr>");
-                out.println("    <td>" + count + "</td>");
-                out.println(
-                    "    <td><a href=\"/board/view?boardSeq=" + board.getSeq() + "\">" + board.getTitle()
-                        + "</a></td>");
-                out.println("    <td>" + board.getCustomerName() + "</td>");
-                out.println("    <td>" + board.getModifiedTime() + "</td>");
-                out.println("  </tr>");
-                count++;
+                if (startSize <= index && endSize >= index) {
+                    out.println("  <tr>");
+                    out.println("    <td>" + (count + 1) + "</td>");
+                    out.println("    <td><a href=\"/board/view?boardSeq=" + board.getSeq() + "\">" + board.getTitle()
+                        + "</a></td>"); // href 닫는 따옴표 추가
+                    out.println("    <td>" + board.getCustomerName() + "</td>");
+                    out.println("    <td>" + board.getModifiedTime() + "</td>");
+                    out.println("  </tr>");
+                    count++;
+                }
+                index++;
+            }
+            pageCount = Math.ceil((double) boardList.size() / onePageMaxNum);
+        }
+        out.println("  </tbody>");
+        out.println("</table>");
+        out.println("<ul class=\"pagination\">");
+        for (int i = 0; i < pageCount; i++) {
+            if (i < 5) {
+                out.println("<li><a href=\"/board?page=" + (i + 1) + "\">" + (i + 1) + "</a></li>");
             }
         }
+
+        out.println("</ul>");
         out.println("  </tbody>");
         out.println("</table>");
         out.println("<div class=\"write-post\">");

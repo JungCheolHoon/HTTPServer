@@ -28,9 +28,6 @@ public class BoardService {
     }
 
     public List<Board> getAll() {
-        var boardCount = 10;
-        var maxPageCount = 5;
-
         return new BoardDao(connection).findAll();
     }
 
