@@ -1,4 +1,4 @@
-package kr.co.mz.tutorial.jdbc;
+package kr.co.mz.tutorial.jdbc.exception;
 
 public class AlertException extends RuntimeException {
 
@@ -11,6 +11,11 @@ public class AlertException extends RuntimeException {
     public AlertException(String message, String redirectUrl) {
         super(message);
         this.redirectUrl = redirectUrl;
+    }
+
+    public AlertException(Throwable t) {
+        super(t);
+        redirectUrl = null;
     }
 
     public String getRedirectUrl() {

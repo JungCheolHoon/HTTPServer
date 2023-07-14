@@ -7,6 +7,14 @@ public abstract class AbstractModel {
     protected Timestamp createdTime;
     protected Timestamp modifiedTime;
 
+    public AbstractModel() {
+    }
+
+    public AbstractModel(Timestamp createdTime, Timestamp modifiedTime) {
+        this.createdTime = createdTime;
+        this.modifiedTime = modifiedTime;
+    }
+
     public Timestamp getCreatedTime() {
         return createdTime;
     }

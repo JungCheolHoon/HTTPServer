@@ -1,4 +1,4 @@
-package kr.co.mz.tutorial.jdbc;
+package kr.co.mz.tutorial.jdbc.exception;
 
 public class NoSuchCustomerFoundException extends AlertException {
 

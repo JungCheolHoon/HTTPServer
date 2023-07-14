@@ -1,24 +1,28 @@
 package kr.co.mz.tutorial.jdbc.servlet.customer;
 
 import static kr.co.mz.tutorial.jdbc.Constants.CUSTOMER_IN_SESSION;
-import static kr.co.mz.tutorial.jdbc.Constants.DATASOURCE_CONTEXT_KEY;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.Optional;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
-import kr.co.mz.tutorial.jdbc.DatabaseAccessException;
-import kr.co.mz.tutorial.jdbc.InputValidationException;
-import kr.co.mz.tutorial.jdbc.NoSuchCustomerFoundException;
-import kr.co.mz.tutorial.jdbc.db.dao.LoginDao;
-import kr.co.mz.tutorial.jdbc.db.model.Customer;
+import kr.co.mz.tutorial.jdbc.Constants;
+import kr.co.mz.tutorial.jdbc.exception.DatabaseAccessException;
+import kr.co.mz.tutorial.jdbc.exception.InputValidationException;
+import kr.co.mz.tutorial.jdbc.service.CustomerService;
 
 public class LoginServlet extends HttpServlet {
+
+    private DataSource dataSource;
+
+    @Override
+    public void init() {
+        this.dataSource = (DataSource) getServletContext().getAttribute(Constants.DATASOURCE_CONTEXT_KEY);
+    }
 
     private static final String PAGE_CONTENTS = """
                 <!DOCTYPE html>
@@ -101,44 +105,26 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String username = req.getParameter("username");
         String password = req.getParameter("password");
-
-        // input validation
         validateInputParameter(username, password);
-//        if (!inputValidationResult) {
-//            req.setAttribute("message", "입력 정보가 올바르지 않습니다.");
-//            req.setAttribute("redirectUrl", "http://localhost:8080/login");
-//            req.getRequestDispatcher("/WEB-INF/jsp/redirect.jsp").forward(req, resp);
-//        }
-
-        // 로그인 처리 로직
-        var customer = findCustomer(username, password);
-        req.getSession().setAttribute(CUSTOMER_IN_SESSION, customer);
-        req.setAttribute("message", "성공적으로 로그인 되었습니다.");
-        req.setAttribute("redirectUrl", "http://localhost:8080/board");
-        req.getRequestDispatcher("/WEB-INF/jsp/redirect.jsp").forward(req, resp);
+        try (var connection = dataSource.getConnection()) {
+            var customer = new CustomerService(connection).findCustomer(username, password);
+            req.getSession().setMaxInactiveInterval(1800);
+            req.getSession().setAttribute(CUSTOMER_IN_SESSION, customer);
+            req.setAttribute("message", "성공적으로 로그인 되었습니다.");
+            req.setAttribute("redirectUrl", "http://localhost:8080/board");
+            req.getRequestDispatcher("/WEB-INF/jsp/redirect.jsp").forward(req, resp);
+        } catch (SQLException sqle) {
+            throw new DatabaseAccessException(sqle);
+        }
     }
 
     private static void validateInputParameter(String username, String password) {
         if (username == null || username.length() < 3) {
-            throw new InputValidationException("사용자명은 세 글자 이상이어야 합니다.");
+            throw new InputValidationException("아이디는 세 글자 이상이어야 합니다.");
         }
         if (password == null || password.length() < 3) {
             throw new InputValidationException("비밀번호은 세 글자 이상이어야 합니다.");
         }
     }
 
-    private Customer findCustomer(String username, String password) {
-        var dataSource = (DataSource) getServletContext().getAttribute(DATASOURCE_CONTEXT_KEY);
-        try (
-            var connection = dataSource.getConnection();
-        ) {
-            var loginDao = new LoginDao(connection);
-            Optional<Customer> optionalCustomer = loginDao.findByUsername(username);
-            return optionalCustomer
-                .filter(customer2 -> password.equals(customer2.getPassword()))
-                .orElseThrow(() -> new NoSuchCustomerFoundException(username));
-        } catch (SQLException sqle) {
-            throw new DatabaseAccessException("데이터베이스 관련 처리에 오류가 발생하였습니다:" + sqle.getMessage(), sqle);
-        }
-    }
 }

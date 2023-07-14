@@ -1,7 +1,5 @@
 package kr.co.mz.tutorial.jdbc.servlet.file;
 
-import static kr.co.mz.tutorial.jdbc.Constants.DATASOURCE_CONTEXT_KEY;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -12,11 +10,19 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
+import kr.co.mz.tutorial.jdbc.Constants;
 import kr.co.mz.tutorial.jdbc.db.dao.BoardFileDao;
 import kr.co.mz.tutorial.jdbc.db.model.BoardFile;
 import kr.co.mz.tutorial.jdbc.file.FileService;
 
 public class FileDownloadServlet extends HttpServlet {
+
+    private DataSource dataSource;
+
+    @Override
+    public void init() {
+        this.dataSource = (DataSource) getServletContext().getAttribute(Constants.DATASOURCE_CONTEXT_KEY);
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -48,7 +54,8 @@ public class FileDownloadServlet extends HttpServlet {
     }
 
     private Optional<BoardFile> findFilePath(String fileUuid) throws SQLException {
-        var dataSource = (DataSource) getServletContext().getAttribute(DATASOURCE_CONTEXT_KEY);
-        return new BoardFileDao(dataSource).findOneFromFileUuid(fileUuid);
+        try (var connection = dataSource.getConnection()) {
+            return new BoardFileDao(connection).findOneFromFileUuid(fileUuid);
+        }
     }
 }

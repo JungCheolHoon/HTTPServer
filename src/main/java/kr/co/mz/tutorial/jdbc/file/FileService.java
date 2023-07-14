@@ -9,11 +9,13 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import javax.servlet.http.Part;
 import kr.co.mz.tutorial.jdbc.db.model.BoardFile;
+import kr.co.mz.tutorial.jdbc.exception.NoFilePermissionException;
 
 public class FileService {
 
@@ -35,7 +37,8 @@ public class FileService {
         return BASIC_DIRECTORY + LocalDateTime.now().toLocalDate().toString().substring(0, 10);
     }
 
-    public Set<BoardFile> upload(Collection<Part> parts, int writeYN) throws IOException {
+    public Set<BoardFile> upload(Collection<Part> parts, List<BoardFile> writeFileList, int writeYN)
+        throws IOException {
         String uploadPath = generateDirectoryName();
         createDirectory();
         Set<BoardFile> boardFileSet = new HashSet<>();
@@ -46,7 +49,17 @@ public class FileService {
             Optional<String> optionalFileName = getName(part);
             String fileName;
             if (optionalFileName.isPresent() && !(fileName = optionalFileName.get()).isEmpty()) {
-                String uuid = UUID.randomUUID().toString();
+                String uuid = null;
+                if (writeFileList != null) {
+                    for (BoardFile boardFile : writeFileList) {
+                        if (fileName.equals(boardFile.getFileName())) {
+                            uuid = boardFile.getFileUuid();
+                        }
+                    }
+                } else {
+                    uuid = UUID.randomUUID().toString();
+                }
+                System.out.println(uuid);
                 String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1);
                 String filePath = uploadPath + java.io.File.separator + uuid + "." + fileExtension;
                 var boardFile = new BoardFile(uuid, fileName, filePath, part.getSize(), fileExtension);
@@ -96,6 +109,7 @@ public class FileService {
             }
         } catch (SecurityException e) {
             System.out.println("File deletion failed because a security exception occurred");
+            throw new NoFilePermissionException(e);
         }
         return flag;
     }

@@ -2,7 +2,6 @@ package kr.co.mz.tutorial.jdbc.db.model;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Objects;
@@ -43,15 +42,6 @@ public class Board extends AbstractModel {
         this.title = title;
         this.content = content;
         this.category = category;
-    }
-
-    public Board(int seq, String title, String content, String customerName, int likes_count, Timestamp modified_time) {
-        this.seq = seq;
-        this.title = title;
-        this.content = content;
-        this.customerName = customerName;
-        this.likesCount = likes_count;
-        super.modifiedTime = modified_time;
     }
 
     public void setBoardFileSet(Set<BoardFile> boardFileSet) {

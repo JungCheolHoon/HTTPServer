@@ -1,23 +1,23 @@
 package kr.co.mz.tutorial.jdbc.filter;
 
+import static kr.co.mz.tutorial.jdbc.Constants.CUSTOMER_IN_SESSION;
+
 import java.io.IOException;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import kr.co.mz.tutorial.jdbc.db.model.Customer;
+import kr.co.mz.tutorial.jdbc.exception.SessionExpiredException;
 
-public class ServletFilter implements Filter {
-
-    private FilterConfig filterConfig;
+public class SessionExpirationCheckFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) {
-        this.filterConfig = filterConfig;
     }
 
     @Override
@@ -25,10 +25,15 @@ public class ServletFilter implements Filter {
         throws IOException, ServletException {
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
         HttpServletResponse httpServletResponse = (HttpServletResponse) servletResponse;
-        ServletContext servletContext = filterConfig.getServletContext();
 
         httpServletResponse.setCharacterEncoding("UTF-8");
         httpServletRequest.setCharacterEncoding("UTF-8");
+
+        var customer = (Customer) httpServletRequest.getSession().getAttribute(CUSTOMER_IN_SESSION);
+        if (customer == null) {
+            throw new SessionExpiredException();
+        }
+
         filterChain.doFilter(servletRequest, servletResponse);
     }
 

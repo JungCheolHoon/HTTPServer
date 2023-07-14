@@ -2,6 +2,7 @@ package kr.co.mz.tutorial.jdbc.db.model;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Objects;
 
 public class BoardFile extends AbstractModel {
@@ -17,8 +18,21 @@ public class BoardFile extends AbstractModel {
     public BoardFile() {
     }
 
+
     public BoardFile(int seq, int boardSeq, String fileUuid, String fileName, String filePath, long fileSize,
         String fileExtension) {
+        this.seq = seq;
+        this.boardSeq = boardSeq;
+        this.fileUuid = fileUuid;
+        this.fileName = fileName;
+        this.filePath = filePath;
+        this.fileSize = fileSize;
+        this.fileExtension = fileExtension;
+    }
+
+    public BoardFile(int seq, int boardSeq, String fileUuid, String fileName, String filePath, long fileSize,
+        String fileExtension, Timestamp fileCreatedTime, Timestamp fileModifiedTime) {
+        super(fileCreatedTime, fileModifiedTime);
         this.seq = seq;
         this.boardSeq = boardSeq;
         this.fileUuid = fileUuid;
@@ -35,6 +49,7 @@ public class BoardFile extends AbstractModel {
         this.fileSize = fileSize;
         this.fileExtension = fileExtension;
     }
+
 
     public int getSeq() {
         return seq;
