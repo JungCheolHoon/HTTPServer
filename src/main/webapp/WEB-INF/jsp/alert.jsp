@@ -7,7 +7,9 @@
   }
 %><script>
 alert("<%=message%>");
-<%if(redirectUrl != null) {%>
+<%if(redirectUrl.equals("history.back()")){%>
+history.back();
+<%} else if(redirectUrl != null) {%>
 document.location.replace("<%=redirectUrl%>");
 <%} else {%>
 history.back();

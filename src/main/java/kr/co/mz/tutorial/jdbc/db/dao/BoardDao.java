@@ -22,7 +22,7 @@ public class BoardDao {
     }
 
     public List<Board> findAll() {
-        var query = "select * from Board b left join customer c on b.customer_seq = c.seq ";
+        var query = "select * from Board b left join customer c on b.customer_seq = c.seq order by b.seq desc";
         System.out.println("Query : " + query);
         try (var ps = connection.prepareStatement(query)) {
             var rs = ps.executeQuery();
@@ -38,7 +38,7 @@ public class BoardDao {
     }
 
     public List<Board> findAny(String category) {
-        var query = "select * from Board b left join customer c on b.customer_seq = c.seq where category=?";
+        var query = "select * from Board b left join customer c on b.customer_seq = c.seq where category=? order by b.seq desc";
         System.out.println("Query : " + query);
         try (var ps = connection.prepareStatement(query)) {
             ps.setString(1, category);
@@ -117,35 +117,23 @@ public class BoardDao {
         }
     }
 
-    public void deleteOne(int boardSeq) {
+    public int deleteOne(int boardSeq) {
         var query = "delete from board where seq=?";
         System.out.println("Query : " + query);
         try (var ps = connection.prepareStatement(query)) {
             ps.setInt(1, boardSeq);
-            var result = ps.executeUpdate();
+            return ps.executeUpdate();
         } catch (SQLException sqle) {
             throw new DatabaseAccessException(sqle);
         }
     }
 
-    public int updateOneOfLikesCount(int boardSeq, int exist) {
-        var updateAddLikesQuery = "update board set likes_count=likes_count+1 where seq=?";
-        var updateMinusLikesQuery = "update board set likes_count=likes_count-1 where seq=?";
-        try (
-            PreparedStatement psAddCount = connection.prepareStatement(updateAddLikesQuery);
-            PreparedStatement psMinusCount = connection.prepareStatement(updateMinusLikesQuery)
-        ) {
-            int result;
-            if (exist != 0) {
-                psMinusCount.setInt(1, boardSeq);
-                System.out.println("Query : " + updateMinusLikesQuery);
-                result = psMinusCount.executeUpdate();
-            } else {
-                psAddCount.setInt(1, boardSeq);
-                System.out.println("Query : " + updateAddLikesQuery);
-                result = psAddCount.executeUpdate();
-            }
-            return result;
+    public int updateOneOfLikesCount(int boardSeq) {
+        var updateLikesQuery = "update board b set likes_count=(select count(*) from board_likes bl where bl.board_seq=b.seq) where b.seq=?";
+        System.out.println("Query : " + updateLikesQuery);
+        try (PreparedStatement ps = connection.prepareStatement(updateLikesQuery)) {
+            ps.setInt(1, boardSeq);
+            return ps.executeUpdate();
         } catch (SQLException sqle) {
             throw new DatabaseAccessException(sqle);
         }

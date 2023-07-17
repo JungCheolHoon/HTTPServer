@@ -116,7 +116,7 @@ public class BoardServlet extends HttpServlet {
         </head>
         <body>
         <h1>게 시 판</h1>
-        <form action="/board" method="post" accept-charset="UTF-8">
+        <form action="/board" method="get" accept-charset="UTF-8">
         <div class="category">
           <label for="category-dropdown">카테고리:</label>
           <select id="category-dropdown" name="category">
@@ -125,97 +125,9 @@ public class BoardServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        List<Board> boardList;
         var blockNum = req.getParameter("blockNum") == null ? 1 : Integer.parseInt(req.getParameter("blockNum"));
-        var page = req.getParameter("page") == null ? 1 : Integer.parseInt(req.getParameter("page"));
-        try (var connection = dataSource.getConnection()) {
-            boardList = new BoardService(connection).getAll();
-        } catch (SQLException sqle) {
-            throw new DatabaseAccessException(sqle);
-        }
-        var onePageMaxNum = 10;
-        // 1 > 1~10         2> 11~20        3> 21~30
-        // pageNum(boardCount)-(boardCount-1) ~ pageNum(boardCount)
-        double pageCount = 0;
-        var maxPageCount = 5;
-
-        resp.setContentType("text/html");
-        PrintWriter out = resp.getWriter();
-
-        out.println(PAGE_CONTENTS);
-        out.println("    <option value=\"전체\">전체</option>");
-        out.println("    <option value=\"여행 경험 공유\">여행 경험 공유</option>");
-        out.println("    <option value=\"여행지 추천\">여행지 추천</option>");
-        out.println("    <option value=\"여행 계획 토론\">여행 계획 토론</option>");
-        out.println("  </select>");
-        out.println("<input type=\"submit\" style=\"background-color: #f90; color:white; border:none\" value=\"확인\"/>");
-        out.println("</div>");
-        out.println("</form>"); // 폼 닫는 태그 추가
-        out.println("<table id=\"post-table\">");
-        out.println("  <thead>");
-        out.println("  <tr>");
-        out.println("    <th>글 번호</th>");
-        out.println("    <th>제목</th>");
-        out.println("    <th>작성자</th>");
-        out.println("    <th>작성일</th>");
-        out.println("  </tr>");
-        out.println("  </thead>");
-        out.println("  <tbody>");
-        var boardSize = 0;
-        if (boardList != null && !boardList.isEmpty()) {
-            boardSize = boardList.size();
-            var count = 0;
-            var index = 1;
-            var startSize = page * onePageMaxNum - (onePageMaxNum - 1);
-            var endSize = Math.min(page * onePageMaxNum, boardList.size());
-            for (Board board : boardList) {
-                if (startSize <= index && endSize >= index) {
-                    out.println("  <tr>");
-                    out.println("    <td>" + (count + 1) + "</td>");
-                    out.println("    <td><a href=\"/board/view?boardSeq=" + board.getSeq() + "\">" + board.getTitle()
-                        + "</a></td>"); // href 닫는 따옴표 추가
-                    out.println("    <td>" + board.getCustomerName() + "</td>");
-                    out.println("    <td>" + board.getModifiedTime() + "</td>");
-                    out.println("  </tr>");
-                    count++;
-                }
-                index++;
-            }
-            pageCount = Math.ceil((double) boardList.size() / onePageMaxNum);
-        }
-        out.println("  </tbody>");
-        out.println("</table>");
-        out.println("<ul class=\"pagination\">");
-        if (blockNum > 1) {
-            out.println("<li><a href=\"/board?page=" + (blockNum - 1) + "\">←</a></li>");
-        }
-        var maxBlockNum = pageCount > maxPageCount * blockNum ? maxPageCount * blockNum : pageCount;
-        System.out.println(maxBlockNum);
-        System.out.println((blockNum - 1) * (int) maxPageCount);
-        for (int i = (blockNum - 1) * (int) maxPageCount; i < maxBlockNum; i++) {
-            out.println("<li><a href=\"/board?blockNum=" + blockNum + "&&page=" + (i + 1) + "\">" + (i + 1)
-                + "</a></li>");
-        }
-
-        if (blockNum * maxPageCount * onePageMaxNum < boardSize) {
-            out.println("<li><a href=\"/board?blockNum=" + (blockNum + 1) + "&&page=" + (blockNum * maxPageCount + 1)
-                + "\">→</a></li>");
-        }
-        out.println("</ul>");
-        out.println("<div class=\"write-post\">");
-        out.println("  <a href=\"/board/write\">글쓰기</a>");
-        out.println("</div>");
-        out.println("</body>");
-        out.println("</html>");
-
-        out.close();
-
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        var page = req.getParameter("page") == null ? 1 : Integer.parseInt(req.getParameter("page"));
-        var category = req.getParameter("category");
+        var pageNum = req.getParameter("pageNum") == null ? 1 : Integer.parseInt(req.getParameter("pageNum"));
+        var category = req.getParameter("category") == null ? "전체" : req.getParameter("category");
         validateInputParameter(category);
         List<Board> boardList;
         try (var connection = dataSource.getConnection()) {
@@ -223,24 +135,24 @@ public class BoardServlet extends HttpServlet {
         } catch (SQLException sqle) {
             throw new DatabaseAccessException(sqle);
         }
-        var onePageMaxNum = 10;
+        var maxBoardCountInOnePage = 10;
         // 1 > 1~10         2> 11~20        3> 21~30
         // pageNum(boardCount)-(boardCount-1) ~ pageNum(boardCount)
-        double pageCount = 0;
+        double totalPageCount = 0;
         var maxPageCount = 5;
         resp.setContentType("text/html");
         PrintWriter out = resp.getWriter();
 
         out.println(PAGE_CONTENTS);
-        out.println("    <option value=\"전체\" " + (req.getParameter("category").equals("전체") ? " selected" : "")
+        out.println("    <option value=\"전체\" " + (category.equals("전체") ? " selected" : "")
             + ">전체</option>");
         out.println(
-            "    <option value=\"여행 경험 공유\" " + (req.getParameter("category").equals("여행 경험 공유") ? " selected" : "")
+            "    <option value=\"여행 경험 공유\" " + (category.equals("여행 경험 공유") ? " selected" : "")
                 + ">여행 경험 공유</option>");
-        out.println("    <option value=\"여행지 추천\" " + (req.getParameter("category").equals("여행지 추천") ? " selected" : "")
+        out.println("    <option value=\"여행지 추천\" " + (category.equals("여행지 추천") ? " selected" : "")
             + ">여행지 추천</option>");
         out.println(
-            "    <option value=\"여행 계획 토론\" " + (req.getParameter("category").equals("여행 계획 토론") ? " selected" : "")
+            "    <option value=\"여행 계획 토론\" " + (category.equals("여행 계획 토론") ? " selected" : "")
                 + ">여행 계획 토론</option>");
         out.println("  </select>");
         out.println("<input type=\"submit\" style=\"background-color: #f90; color:white; border:none\" value=\"확인\"/>");
@@ -256,34 +168,44 @@ public class BoardServlet extends HttpServlet {
         out.println("  </tr>");
         out.println("  </thead>");
         out.println("  <tbody>");
+        var boardSize = 0;
         if (boardList != null && !boardList.isEmpty()) {
-            var count = 0;
+            boardSize = boardList.size();
             var index = 1;
-            var startSize = page * onePageMaxNum - (onePageMaxNum - 1) < boardList.size() ? 1
-                : page * onePageMaxNum - (onePageMaxNum - 1);
-            var endSize = Math.min(page * onePageMaxNum, boardList.size());
+            var startIndex = pageNum * maxBoardCountInOnePage - (maxBoardCountInOnePage - 1);
+            var endIndex = Math.min(pageNum * maxBoardCountInOnePage, boardList.size());
             for (Board board : boardList) {
-                if (startSize <= index && endSize >= index) {
+                if (startIndex <= index && endIndex >= index) {
                     out.println("  <tr>");
-                    out.println("    <td>" + (count + 1) + "</td>");
+                    out.println("    <td>" + (index) + "</td>");
                     out.println("    <td><a href=\"/board/view?boardSeq=" + board.getSeq() + "\">" + board.getTitle()
                         + "</a></td>"); // href 닫는 따옴표 추가
                     out.println("    <td>" + board.getCustomerName() + "</td>");
                     out.println("    <td>" + board.getModifiedTime() + "</td>");
                     out.println("  </tr>");
-                    count++;
                 }
                 index++;
             }
-            pageCount = Math.ceil((double) boardList.size() / onePageMaxNum);
+            totalPageCount = Math.ceil((double) boardList.size() / maxBoardCountInOnePage);
         }
         out.println("  </tbody>");
         out.println("</table>");
         out.println("<ul class=\"pagination\">");
-        for (int i = 0; i < pageCount; i++) {
-            if (i < 5) {
-                out.println("<li><a href=\"/board?page=" + (i + 1) + "\">" + (i + 1) + "</a></li>");
-            }
+        if (blockNum > 1) {
+            out.println(
+                "<li><a href=\"/board?blockNum=" + (blockNum - 1) + "&&pageNum=" + ((blockNum - 2) * maxPageCount + 1)
+                    + "&&category=" + category + "\">←</a></li>");
+        }
+        var maxPageNumInBlock = totalPageCount > maxPageCount * blockNum ? maxPageCount * blockNum : totalPageCount;
+        for (int i = (blockNum - 1) * maxPageCount; i < maxPageNumInBlock; i++) {
+            out.println(
+                "<li><a " + ((pageNum == i + 1) ? "style=\"background-color: #f90\"" : "") + " href=\"/board?blockNum="
+                    + blockNum + "&&pageNum=" + (i + 1) + "&&category=" + category + "\">" + (i + 1) + "</a></li>");
+        }
+
+        if (blockNum * maxPageCount * maxBoardCountInOnePage < boardSize) {
+            out.println("<li><a href=\"/board?blockNum=" + (blockNum + 1) + "&&pageNum=" + (blockNum * maxPageCount + 1)
+                + "&&category=" + category + "\">→</a></li>");
         }
 
         out.println("</ul>");
@@ -296,10 +218,12 @@ public class BoardServlet extends HttpServlet {
         out.println("</html>");
 
         out.close();
+
     }
 
     private static void validateInputParameter(String category) {
-        if (category == null) {
+        if (!category.equals("전체") && !category.equals("여행 경험 공유") && !category.equals("여행지 추천") && !category.equals(
+            "여행 계획 토론")) {
             throw new InputValidationException("카테고리가 잘못입력되었습니다.");
         }
     }

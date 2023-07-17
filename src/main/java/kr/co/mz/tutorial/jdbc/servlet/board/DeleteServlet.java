@@ -1,5 +1,6 @@
 package kr.co.mz.tutorial.jdbc.servlet.board;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -19,7 +20,7 @@ public class DeleteServlet extends HttpServlet {
     }
 
     @Override
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) {
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String pathInfo = req.getPathInfo();
         String[] pathParts = pathInfo.split("/");
         var boardSeq = pathParts[1];
@@ -29,6 +30,7 @@ public class DeleteServlet extends HttpServlet {
             if (result == 0) {
                 resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
+            resp.getWriter().println("게시글이 삭제되었습니다.");
         } catch (SQLException sqle) {
             throw new DatabaseAccessException(sqle);
         }

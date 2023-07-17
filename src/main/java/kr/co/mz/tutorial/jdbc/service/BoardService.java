@@ -27,10 +27,6 @@ public class BoardService {
         this.connection = connection;
     }
 
-    public List<Board> getAll() {
-        return new BoardDao(connection).findAll();
-    }
-
     public List<Board> getByCategory(String category) {
         if (category.equals("전체")) {
             return new BoardDao(connection).findAll();
@@ -70,7 +66,7 @@ public class BoardService {
             var writeYN = 0;
             var boardFileSet = fileService.upload(parts, null, writeYN);
             if (boardFileSet == null) {
-                throw new FileLimitException();
+                throw new FileLimitException("history.back()");
             }
             board.setBoardFileSet(boardFileSet);
             new BoardDao(connection).updateOne(board);
@@ -111,22 +107,20 @@ public class BoardService {
             var filePathList = boardFileDao.findAllFromBoardSeq(boardSeq);
             boardFileDao.deleteAllFromBoardSeq(boardSeq);
             new CommentDao(connection).deleteAllByBoardSeq(boardSeq);
-            new BoardDao(connection).deleteOne(boardSeq);
-            int numberOfFiles = 0;
+            int result = new BoardDao(connection).deleteOne(boardSeq);
             for (String filePath : filePathList) {
                 boolean flag = new FileService().delete(filePath);
                 if (flag) {
                     System.out.println("Success Delete File on Server Storage : " + filePath);
                 }
-                numberOfFiles++;
             }
             connection.commit();
-            return numberOfFiles;
+            return result;
         } catch (SQLException sqle) {
             try {
                 connection.rollback();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
+            } catch (SQLException sqle2) {
+                throw new DatabaseAccessException(sqle2);
             }
             throw new DatabaseAccessException(sqle);
         }
@@ -138,14 +132,12 @@ public class BoardService {
             var likesDao = new LikesDao(connection);
             var boardDao = new BoardDao(connection);
             int likesPrimaryKey = new LikesDao(connection).findOne(boardSeq, customer.getSeq());
-            int result;
             if (likesPrimaryKey != 0) {
                 likesDao.deleteOne(likesPrimaryKey);
-                result = boardDao.updateOneOfLikesCount(boardSeq, 1);
             } else {
                 likesDao.insertOne(boardSeq, customer.getSeq());
-                result = boardDao.updateOneOfLikesCount(boardSeq, 0);
             }
+            int result = boardDao.updateOneOfLikesCount(boardSeq);
             connection.commit();
             return result;
         } catch (SQLException sqle) {

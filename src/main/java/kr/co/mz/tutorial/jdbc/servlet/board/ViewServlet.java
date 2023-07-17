@@ -132,7 +132,7 @@ public class ViewServlet extends HttpServlet {
               xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
               xhr.onload = function () {
                 if (xhr.status === 200) {
-                  alert('게시글이 삭제되었습니다.');
+                  alert(xhr.responseText);
                   window.location.href = '/board'; // 게시글 목록 페이지로 이동
                 } else {
                   alert('게시글 삭제가 실패되었습니다.');

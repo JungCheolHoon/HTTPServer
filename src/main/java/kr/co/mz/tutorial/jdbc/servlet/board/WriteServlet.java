@@ -125,9 +125,9 @@ public class WriteServlet extends HttpServlet {
         var boardFileSet = new FileService().upload(req.getParts(), null, 1);
 
         if (boardFileSet == null) {
-            throw new FileLimitException();
+            throw new FileLimitException("http://localhost:8080/board/write");
         }
-        
+
         board.setBoardFileSet(boardFileSet);
         try (var connection = dataSource.getConnection()) {
             var boardSeq = new BoardService(connection).write(board, customer);
