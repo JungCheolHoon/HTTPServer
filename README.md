@@ -1,2 +1,3 @@
-- Web Application Server : Tomcat With Servlet
+- SpringBoot FrameWork 를 사용하기 이전에 어떤 프로세스로 웹 서버를 구현하였는지 확인하기 위해, Jdbc로 DB 연동 및 Servlet 기반의 Web Application Server 구현
 - JDBC Transaction Tutorial : try - catch
+- Tomcat With Servlet
