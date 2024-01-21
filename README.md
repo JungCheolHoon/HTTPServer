@@ -1,2 +1,2 @@
 - Web Application Server : Tomcat With Servlet
-- JDBC Transaction Test : try - catch
+- JDBC Transaction Tutorial : try - catch
