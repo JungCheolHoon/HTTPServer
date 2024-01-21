@@ -1,3 +1,3 @@
-- Jdbc로 DB 연동 및 Servlet 기반의 Web Application Server 구현
+- JDBC 로 DB Connect 및 Servlet 기반의 Web Application Server 구현
 - JDBC Transaction Tutorial : try - catch
 - Tomcat With Servlet
