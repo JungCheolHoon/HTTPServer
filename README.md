@@ -1,1 +1,2 @@
-- Tomcat과 servlet을 활용한 Web Application Server
+- Web Application Server : Tomcat With Servlet
+- JDBC Transaction Test : try - catch
