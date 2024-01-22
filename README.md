@@ -1,4 +1,4 @@
-# Servlet 기반 Web Application Server
+# Servlet 기반 WAS 환경에서 Jdbc Transactional Tutorial
 ## Process
 #### 1. ServletLinster 를 상속한 객체를 정의
 #### 2. web.xml 에 Listener 및 Servlet 에 해당하는 라우팅 정보를 정의
