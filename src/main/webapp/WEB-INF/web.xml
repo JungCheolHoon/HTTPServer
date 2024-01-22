@@ -118,7 +118,15 @@
   </filter>
   <filter-mapping>
     <filter-name>SessionExpirationCheckFilter</filter-name>
-    <url-pattern>/board/*</url-pattern>
+    <url-pattern>/board/write</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>SessionExpirationCheckFilter</filter-name>
+    <url-pattern>/board/update</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>SessionExpirationCheckFilter</filter-name>
+    <url-pattern>/board/view/*</url-pattern>
   </filter-mapping>
   <error-page>
     <exception-type>kr.co.mz.tutorial.jdbc.exception.AlertException</exception-type>

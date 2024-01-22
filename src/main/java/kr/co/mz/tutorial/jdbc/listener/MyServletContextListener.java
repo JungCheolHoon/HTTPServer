@@ -1,13 +1,14 @@
 package kr.co.mz.tutorial.jdbc.listener;
 
-import static kr.co.mz.tutorial.jdbc.Constants.DATASOURCE_CONTEXT_KEY;
-
 import com.zaxxer.hikari.HikariDataSource;
+
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.sql.DataSource;
+
+import static kr.co.mz.tutorial.jdbc.Constants.DATASOURCE_CONTEXT_KEY;
 
 public class MyServletContextListener implements ServletContextListener {
 

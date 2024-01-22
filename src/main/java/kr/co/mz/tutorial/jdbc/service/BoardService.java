@@ -130,21 +130,21 @@ public class BoardService {
         try {
             connection.setAutoCommit(false);
             var likesDao = new LikesDao(connection);
-            var boardDao = new BoardDao(connection);
-            int likesPrimaryKey = new LikesDao(connection).findOne(boardSeq, customer.getSeq());
+            int likesPrimaryKey = likesDao.findOne(boardSeq, customer.getSeq());
+            new BoardDao(connection).updateOneOfLikesCount(boardSeq, likesPrimaryKey);
+            int result;
             if (likesPrimaryKey != 0) {
-                likesDao.deleteOne(likesPrimaryKey);
+                result = likesDao.deleteOne(likesPrimaryKey);
             } else {
-                likesDao.insertOne(boardSeq, customer.getSeq());
+                result = likesDao.insertOne(boardSeq, customer.getSeq());
             }
-            int result = boardDao.updateOneOfLikesCount(boardSeq);
             connection.commit();
             return result;
         } catch (SQLException sqle) {
             try {
                 connection.rollback();
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                throw new DatabaseAccessException(sqle);
             }
             throw new DatabaseAccessException(sqle);
         }

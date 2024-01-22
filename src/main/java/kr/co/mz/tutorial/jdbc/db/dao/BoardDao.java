@@ -128,12 +128,20 @@ public class BoardDao {
         }
     }
 
-    public int updateOneOfLikesCount(int boardSeq) {
-        var updateLikesQuery = "update board b set likes_count=(select count(*) from board_likes bl where bl.board_seq=b.seq) where b.seq=?";
-        System.out.println("Query : " + updateLikesQuery);
-        try (PreparedStatement ps = connection.prepareStatement(updateLikesQuery)) {
-            ps.setInt(1, boardSeq);
-            return ps.executeUpdate();
+    // TODO 좋아요 쿼리 +1 , -1 로 고쳐야함
+    public int updateOneOfLikesCount(int boardSeq, int likesPrimaryKey) {
+        var updateAddLikesQuery = "update board b set likes_count=likes_count + 1 where b.seq=?";
+        var updateMinusLikesQuery = "update board b set likes_count=likes_count - 1 where b.seq=?";
+        System.out.println("Query : " + updateAddLikesQuery);
+        try (PreparedStatement ps = connection.prepareStatement(updateAddLikesQuery);
+            PreparedStatement ps2 = connection.prepareStatement(updateMinusLikesQuery)) {
+            if (likesPrimaryKey == 0) {
+                ps.setInt(1, boardSeq);
+                return ps.executeUpdate();
+            } else {
+                ps2.setInt(1, boardSeq);
+                return ps2.executeUpdate();
+            }
         } catch (SQLException sqle) {
             throw new DatabaseAccessException(sqle);
         }

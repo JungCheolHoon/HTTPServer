@@ -29,22 +29,22 @@ public class LikesDao {
         }
     }
 
-    public void insertOne(int boardSeq, int customerSeq) throws SQLException {
+    public int insertOne(int boardSeq, int customerSeq) throws SQLException {
         var query = "insert into board_likes(board_seq,customer_seq) values(?,?)";
         System.out.println("Query : " + query);
         try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setInt(1, boardSeq);
             ps.setInt(2, customerSeq);
-            ps.executeUpdate();
+            return ps.executeUpdate();
         }
     }
 
-    public void deleteOne(int primaryKey) throws SQLException {
+    public int deleteOne(int primaryKey) throws SQLException {
         var query = "delete from board_likes where seq=?";
         System.out.println("Query : " + query);
         try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setInt(1, primaryKey);
-            ps.executeUpdate();
+            return ps.executeUpdate();
         }
     }
 
