@@ -3,7 +3,6 @@
 #### 1. ServletLinster 를 상속한 객체를 정의
 #### 2. web.xml 에 Listener 및 Servlet 에 해당하는 라우팅 정보를 정의
 #### 3. Servlet - Service - Dao 구조
-
 ## Result
 #### 1. Tomcat 은 웹 서버의 한 종류로써, Servlet Container 와 Serlvet 기술을 활용하여 요청과 응답을 처리
 #### 2. Servlet Container 란 Servlet 관리하고 처리하는 객체
