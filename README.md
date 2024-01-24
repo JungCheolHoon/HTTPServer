@@ -3,6 +3,7 @@
 #### 1. ServletLinster 를 상속한 객체를 정의
 #### 2. web.xml 에 Listener 및 Servlet 에 해당하는 라우팅 정보를 정의
 #### 3. Servlet - Service - Dao 구조
+#### 4. Tomcat9 을 활용한 멀티쓰레드 기반
 ## Result
 #### 1. 사용자와 Servlet 서버간에는 HTTP 통신 프로토콜 기반의 TCP 연결을 수행하며 데이터 패킷을 HttpServletRequest 캡슐화 하여 처리
 #### 2. Tomcat 은 웹 서버의 한 종류로써, Servlet Container 와 Serlvet 기술을 활용하여 요청과 응답을 처리
