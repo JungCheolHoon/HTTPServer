@@ -1,8 +1,8 @@
-# Servlet API 를 구현한 HTTP Server - Jdbc Transactional Tutorial
+# Servlet API 를 구현한 HTTP Server - Jdbc Transactional Tutorial<br/>
 ## Process
 #### 1. Servlet - Service - Dao 구조로써 Tomcat9 을 활용한 Multi Thread 기반
 #### 2. ServletLinster 를 상속한 클래스를 정의하여 서블릿 컨테이너의 생명주기 구성
-#### 3. web.xml 에 Listener 및 Servlet 에 해당하는 라우팅 정보를 정의
+#### 3. web.xml 에 Listener 및 Servlet 에 해당하는 라우팅 정보를 정의<br/><br/><br/>
 ## Realizaion From Results 
 #### 1. 사용자와 Servlet 서버간에는 HTTP 통신 프로토콜 기반의 TCP 연결을 수행하며 데이터 패킷을 HttpServletRequest 로 캡슐화
 #### 2. Tomcat 은 WAS 의 한 종류로써, Servlet Container 와 Serlvet API 를 활용하여 요청과 응답을 처리
