@@ -15,5 +15,5 @@
 #### 4. Servlet Container 는 Web.xml 과 Listener 로써 정의된 클래스를 읽어서 설정을 초기화
 #### 5. SpringBoot 를 사용하기 이전에는 동적 페이지를 Servlet 에서 생성해서 응답을 반환
 #### 6. SpringBoot 는 web.xml 을 사용하지 않고, @Controller 어노테이션이 적용된 클래스를 찾아 리소스 경로를 정의
-#### 7. 최근에는 CSR 을 수행하며, 객체를 계층형태의 Json 형태로 Jackson으로 변환하여 응답을 반환하는 프로세스
+#### 7. 최근에는 CSR 을 수행하며, Jackson 라이브러리로 객체를 계층형태의 Json 형태로 변환하여 응답을 반환하는 프로세스
 #### 8. Transactional 은 try-catch 또는 try-with-resource 구문을 활용하여 commit , rollback , exception 을 처리
