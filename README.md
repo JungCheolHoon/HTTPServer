@@ -36,7 +36,6 @@ Tomcat과 Servlet API를 활용한 멀티스레드 기반의 웹 애플리케이
 - **Servlet API**: Java Servlet
 - **Database**: JDBC
 - **Configuration**: web.xml
-- **Build Tool**: Maven/Gradle
 
 ## 학습 내용
 ### 1. Servlet Container 동작 원리
