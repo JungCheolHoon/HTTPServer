@@ -7,7 +7,6 @@ Tomcat과 Servlet API를 활용한 멀티스레드 기반의 웹 애플리케이
 - [시스템 아키텍처](#시스템-아키텍처)
 - [주요 기능](#주요-기능)
 - [기술 스택](#기술-스택)
-- [설정 및 실행](#설정-및-실행)
 - [학습 내용](#학습-내용)
 
 ## 프로젝트 개요
@@ -25,15 +24,6 @@ Tomcat과 Servlet API를 활용한 멀티스레드 기반의 웹 애플리케이
    - 애플리케이션 생명주기 관리
    - 리소스 초기화
 
-3. **계층 구조**
-   ```
-   Servlet (Presentation Layer)
-      ↓
-   Service (Business Layer)
-      ↓
-   DAO (Data Access Layer)
-   ```
-
 ## 주요 기능
 - HTTP 요청/응답 처리
 - 멀티스레드 기반 요청 처리
@@ -48,27 +38,6 @@ Tomcat과 Servlet API를 활용한 멀티스레드 기반의 웹 애플리케이
 - **Configuration**: web.xml
 - **Build Tool**: Maven/Gradle
 
-## 설정 및 실행
-### web.xml 설정
-```xml
-<web-app>
-    <!-- Listener 설정 -->
-    <listener>
-        <listener-class>com.example.listener.ApplicationListener</listener-class>
-    </listener>
-    
-    <!-- Servlet 매핑 -->
-    <servlet>
-        <servlet-name>mainServlet</servlet-name>
-        <servlet-class>com.example.servlet.MainServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>mainServlet</servlet-name>
-        <url-pattern>/main/*</url-pattern>
-    </servlet-mapping>
-</web-app>
-```
-
 ## 학습 내용
 ### 1. Servlet Container 동작 원리
 - ServletListener를 통한 초기화 과정
@@ -82,7 +51,7 @@ Tomcat과 Servlet API를 활용한 멀티스레드 기반의 웹 애플리케이
 
 ### 2. 트랜잭션 관리
 ```java
-try (Connection conn = dataSource.getConnection()) {
+try{
     conn.setAutoCommit(false);
     // 비즈니스 로직 수행
     conn.commit();
