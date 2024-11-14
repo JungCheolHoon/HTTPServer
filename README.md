@@ -1,19 +1,115 @@
-# HTTP Server - Jdbc Transactional Tutorial<br/>
+# Java Servlet & JDBC Transaction Tutorial
 
+Tomcat과 Servlet API를 활용한 멀티스레드 기반의 웹 애플리케이션 구현 프로젝트입니다. 서블릿 컨테이너의 생명주기를 이해하고 JDBC 트랜잭션을 직접 다루어 보는 것을 목표로 합니다.
 
-## Process
-#### 1. Tomcat , Servlet API 를 활용
-#### 2. Servlet - Service - Dao 구조로써 Multi Thread 기반
-#### 3. ServletLinster 를 상속한 클래스를 정의하여 서블릿 컨테이너의 생명주기 구성
-#### 4. web.xml 에 Listener 및 Servlet 에 해당하는 라우팅 정보를 정의<br/><br/><br/>
+## 📋 목차
+- [프로젝트 개요](#프로젝트-개요)
+- [시스템 아키텍처](#시스템-아키텍처)
+- [주요 기능](#주요-기능)
+- [기술 스택](#기술-스택)
+- [설정 및 실행](#설정-및-실행)
+- [학습 내용](#학습-내용)
 
+## 프로젝트 개요
+이 프로젝트는 Spring Framework를 사용하지 않고 순수 Servlet과 JDBC를 활용하여 웹 애플리케이션을 구현합니다. Servlet Container의 동작 원리와 JDBC 트랜잭션 관리를 실습하여 웹 애플리케이션의 기본 동작 원리를 이해합니다.
 
-## Realizaion
-#### 1. 사용자와 Servlet 서버간에는 HTTP 통신 프로토콜 기반의 TCP 연결을 수행하며 데이터 패킷을 HttpServletRequest 로 캡슐화
-#### 2. Tomcat 은 WAS 의 한 종류로써, Servlet Container 와 Serlvet API 를 활용하여 요청과 응답을 처리
-#### 3. Servlet Container 란 Servlet 관리하고 처리하는 객체
-#### 4. Servlet Container 는 Web.xml 과 Listener 로써 정의된 클래스를 읽어서 설정을 초기화
-#### 5. SpringBoot 를 사용하기 이전에는 동적 페이지를 Servlet 에서 생성해서 응답을 반환
-#### 6. SpringBoot 는 web.xml 을 사용하지 않고, @Controller 어노테이션이 적용된 클래스를 찾아 리소스 경로를 정의
-#### 7. 최근에는 CSR 을 수행하며, Jackson 라이브러리로 객체를 계층형태의 Json 형태로 변환하여 응답을 반환하는 프로세스
-#### 8. Transactional 은 try-catch 또는 try-with-resource 구문을 활용하여 commit , rollback , exception 을 처리
+## 시스템 아키텍처
+### 핵심 컴포넌트
+1. **Servlet Container (Tomcat)**
+   - 서블릿 생명주기 관리
+   - HTTP 요청/응답 처리
+   - 멀티스레드 관리
+
+2. **ServletListener**
+   - 서블릿 컨테이너 초기화
+   - 애플리케이션 생명주기 관리
+   - 리소스 초기화
+
+3. **계층 구조**
+   ```
+   Servlet (Presentation Layer)
+      ↓
+   Service (Business Layer)
+      ↓
+   DAO (Data Access Layer)
+   ```
+
+## 주요 기능
+- HTTP 요청/응답 처리
+- 멀티스레드 기반 요청 처리
+- JDBC 트랜잭션 관리
+- 동적 웹 페이지 생성
+- 데이터베이스 CRUD 작업
+
+## 기술 스택
+- **WAS**: Apache Tomcat
+- **Servlet API**: Java Servlet
+- **Database**: JDBC
+- **Configuration**: web.xml
+- **Build Tool**: Maven/Gradle
+
+## 설정 및 실행
+### web.xml 설정
+```xml
+<web-app>
+    <!-- Listener 설정 -->
+    <listener>
+        <listener-class>com.example.listener.ApplicationListener</listener-class>
+    </listener>
+    
+    <!-- Servlet 매핑 -->
+    <servlet>
+        <servlet-name>mainServlet</servlet-name>
+        <servlet-class>com.example.servlet.MainServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>mainServlet</servlet-name>
+        <url-pattern>/main/*</url-pattern>
+    </servlet-mapping>
+</web-app>
+```
+
+## 학습 내용
+### 1. Servlet Container 동작 원리
+- ServletListener를 통한 초기화 과정
+- 서블릿 생명주기 (init → service → destroy)
+- HTTP 요청/응답 처리 과정
+  ```java
+  protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+      // HTTP 요청 처리
+  }
+  ```
+
+### 2. 트랜잭션 관리
+```java
+try (Connection conn = dataSource.getConnection()) {
+    conn.setAutoCommit(false);
+    // 비즈니스 로직 수행
+    conn.commit();
+} catch (SQLException e) {
+    conn.rollback();
+    throw e;
+}
+```
+
+### 3. Spring과의 차이점
+1. **설정 방식**
+   - Servlet: web.xml 기반 설정
+   - Spring: 어노테이션 기반 설정
+
+2. **요청 처리**
+   - Servlet: HttpServlet 상속
+   - Spring: @Controller 어노테이션
+
+3. **트랜잭션 관리**
+   - Servlet: 수동 트랜잭션 관리
+   - Spring: @Transactional 어노테이션
+
+### 4. 최신 웹 개발 트렌드와의 비교
+1. **페이지 렌더링**
+   - JSP: 서버 사이드 렌더링(SSR)
+   - 최신: 클라이언트 사이드 렌더링(CSR)
+
+2. **데이터 포맷**
+   - 과거: HTML 페이지 전체 전송
+   - 현재: JSON 기반 데이터 통신
